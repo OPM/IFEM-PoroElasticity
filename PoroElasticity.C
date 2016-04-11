@@ -74,7 +74,7 @@ void PoroElasticity::MixedElmMats::makeNewtonMatrix_U(Matrix& N) const
 {
   size_t n = A[uu].rows();
   N.fillBlock(A[uu], 1, 1);
-  N.fillBlock(A[up], 1, 1+n);
+  N.addBlock(A[up], -1.0, 1, 1+n);
 }
 
 
@@ -138,7 +138,7 @@ void PoroElasticity::NonMixedElmMats::makeNewtonMatrix_U(Matrix& N) const
     for (size_t j = 1; j <= n; ++j) {
       for (size_t l = 1; l <= nsd; ++l) {
         // UP-coupling
-        N(nf*(i-1)+l, j*nf) = A[up](nsd*(i-1)+l, j);
+        N(nf*(i-1)+l, j*nf) = -A[up](nsd*(i-1)+l, j);
         for (size_t k = 1; k <= nsd; ++k) {
           // UU-coupling
           N(nf*(i-1)+l, (j-1)*nf+k) = A[uu](nsd*(i-1)+l, (j-1)*nsd+k);
@@ -300,7 +300,7 @@ bool PoroElasticity::evalStiffnessMatrix(Matrix& mx, const Matrix &B, const Matr
 {
   Matrix CB;
   CB.multiply(C, B, false, false);
-  CB *= -1.0 * detJxW;
+  CB *= detJxW;
   mx.multiply(B, CB, true, false, true);
 
   return true;
@@ -441,7 +441,7 @@ bool PoroElasticity::evalBou (LocalIntegral& elmInt,
   ElmMats& elMat = static_cast<ElmMats&>(elmInt);
   for (size_t i = 1; i <= fe.basis(1).size(); i++)
     for (unsigned short int j = 1; j <= nsd; j++)
-      elMat.b[Fu](nsd*(i-1)+j) += -1.0 * trac[j-1] * fe.basis(1)(i) * fe.detJxW;
+      elMat.b[Fu](nsd*(i-1)+j) += trac[j-1] * fe.basis(1)(i) * fe.detJxW;
 
   return true;
 }
