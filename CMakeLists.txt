@@ -38,7 +38,7 @@ if(NOT TARGET Elasticity)
   add_subdirectory(../Elasticity Elasticity)
 endif()
 
-set(PoroElasticity_SRCS PoroElasticity.C PoroMaterial.C)
+set(PoroElasticity_SRCS PoroElasticity.C PoroMaterial.C ElmMats.C)
 
 add_library(CommonPoro STATIC ${PoroElasticity_SRCS})
 target_link_libraries(CommonPoro Elasticity)

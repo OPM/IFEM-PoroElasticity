@@ -18,6 +18,51 @@
 #include "ElmMats.h"
 
 
+//! \brief Enum for element level solution vectors
+enum SolutionVectors
+{
+  U = 0,                        // Displacement
+  P = 1,                        // Pore pressure
+  NSOL = 2
+};
+
+
+//! \brief Enum for element level right-hand-side vectors
+enum ResidualVectors
+{
+  // System vectors, "global" size
+  Fsys = 0,                     // Final RHS vector
+  Fcur = 1,                     // RHS contribution from this timestep
+  Fprev = 2,                    // RHS contribution from previous timestep
+
+  // Sub-vectors, sized according to the bases in question
+  Fu = 3,                       // Traction and body forces
+  Fp = 4,                       // Flux and body forces
+
+  NVEC = 5
+};
+
+
+//! \brief Enum for element level left-hand-side matrices
+enum TangentMatrices
+{
+  // System matrices, "global" size (note: order is fixed according to Newmark API)
+  sys = 0,                      // Final newton matrix
+  sys_M = 1,                    // Acceleration term in Newmark
+  sys_C = 2,                    // Velocity term in Newmark
+  sys_K = 3,                    // Zero-order term in Newmark
+
+  // Sub-matrices, sized according to the bases in question
+  uu_K = 4,                     // Stiffness matrix
+  uu_M = 5,                     // Mass matrix
+  up = 6,                       // Coupling matrix
+  pp_S = 7,                     // Compressibility matrix
+  pp_P = 8,                     // Permeability matrix
+
+  NMAT = 9
+};
+
+
 /*!
   \brief Class representing the integrand of the PoroElasticity problem.
 */
