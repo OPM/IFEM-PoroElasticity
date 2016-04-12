@@ -32,14 +32,17 @@ enum ResidualVectors
 {
   // System vectors, "global" size
   Fsys = 0,                     // Final RHS vector
-  Fcur = 1,                     // RHS contribution from this timestep
-  Fprev = 2,                    // RHS contribution from previous timestep
+  Fprev = 1,                    // RHS contribution from previous timestep
 
   // Sub-vectors, sized according to the bases in question
-  Fu = 3,                       // Traction and body forces
-  Fp = 4,                       // Flux and body forces
+  Fu = 2,                       // Traction and body forces
+  Fp = 3,                       // Flux and body forces
 
-  NVEC = 5
+  // Reserved for Newmark integration
+  Fv = 4,                       // Velocity
+  Fa = 5,                       // Acceleration
+
+  NVEC = 6
 };
 
 
@@ -144,6 +147,42 @@ class PoroElasticity : public Elasticity
     virtual void add_pp(size_t source, size_t target, double scale = 1.0);
     //! \brief Forms a system vector out of two sub-vectors
     virtual void form_vector(const Vector &u, const Vector &p, size_t target);
+  };
+
+  /*!
+   * \brief Newmark element matrices for PoroElasticity
+   */
+  template<class M>
+  class NewmarkMats : public M
+  {
+  public:
+    //! \brief Default constructor
+    NewmarkMats(size_t ndof_displ, size_t ndof_press, bool neumann, double b, double c)
+      : M(ndof_displ, ndof_press, neumann), beta(b), gamma(c) {}
+    //! \brief Empty destructor
+    virtual ~NewmarkMats() {}
+    //! \brief Updates the time step size and the \a isPredictor flag.
+    //! \param[in] dt New time step size
+    void setStepSize(double dt, int) { h = dt; }
+    //! \brief Returns the element level Newton matrix
+    virtual const Matrix& getNewtonMatrix() const
+    {
+      Matrix& N = const_cast<Matrix&>(M::A.front());
+      N = M::A[sys_M];
+      N.add(M::A[sys_C], gamma*h);
+      N.add(M::A[sys_K], beta*h*h);
+      return M::A.front();
+    }
+    //! \brief Returns the element level RHS vector
+    virtual const Vector& getRHSVector() const
+    {
+      Vector &F = const_cast<Vector&>(M::b.front());
+      F.add(M::A[sys_M] * M::b[Fa], -1.0);
+      F.add(M::A[sys_C] * M::b[Fv], -1.0);
+      return M::b.front();
+    }
+  protected:
+    double beta, gamma, h;
   };
 
 public:
