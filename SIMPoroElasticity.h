@@ -214,7 +214,7 @@ struct SolverConfigurator< SIMPoroElasticity<Dim> > {
     // Setup integration
     pe.setQuadratureRule(pe.opt.nGauss[0],true);
     pe.initSystem(pe.opt.solver);
-    pe.setMode(SIM::DYNAMIC);
+    pe.setMode(SIM::STATIC);
     pe.init();
 
     return 0;
