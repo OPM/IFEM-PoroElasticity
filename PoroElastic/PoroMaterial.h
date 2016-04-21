@@ -7,7 +7,7 @@
 //!
 //! \author Arne Morten Kvarving / SINTEF
 //!
-//! \brief Class for poro-elastic material models.
+//! \brief Class for poroelastic material models.
 //!
 //==============================================================================
 
@@ -34,14 +34,13 @@ public:
     Function* function;                 //!< Function definition
     typename Function::Output constant; //!< Constant
 
-    //! \brief Constructor.
+    //! \brief Default constructor.
     FuncConstPair() { function = nullptr; constant = 0.0; }
 
-    //! \brief Parse an XML element. Specialized per function type.
+    //! \brief Parses an XML element. Specialized per function type.
     Function* parse(const char*, const std::string&) { return nullptr; }
 
-    //! \brief Evaluates the function.
-    //! \param[in] X the value to evaluate at.
+    //! \brief Evaluates the function at the given point \b X.
     typename Function::Output evaluate(const typename Function::Input& X) const
     {
       return function ? (*function)(X) : constant;
@@ -96,11 +95,19 @@ public:
   //!   0 : Calculate the constitutive matrix only,
   //!   1 : Calculate Cauchy stresses and the constitutive matrix,
   //!   3 : Calculate the strain energy density only.
-  virtual bool evaluate(Matrix& C, SymmTensor& sigma, double& U,
+  virtual bool evaluate(Matrix& Cmat, SymmTensor& sigma, double& U,
                         const FiniteElement&, const Vec3& X,
                         const Tensor&, const SymmTensor& eps,
                         char iop = 1, const TimeDomain* = nullptr,
                         const Tensor* = nullptr) const;
+
+  //! \brief Evaluates the Lame-parameters at an integration point.
+  //! \param[out] lambda Lame's first parameter
+  //! \param[out] mu Lame's second parameter (shear modulus)
+  //! \param[in] fe Finite element quantities at current point
+  //! \param[in] X Cartesian coordinates of current point
+  virtual bool evaluate(double& lambda, double& mu,
+                        const FiniteElement& fe, const Vec3& X) const;
 
 protected:
   FuncConstPair<RealFunc> Emod; //!< Young's modulus

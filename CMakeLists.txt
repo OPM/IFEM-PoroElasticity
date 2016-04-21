@@ -14,6 +14,9 @@ endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IFEM_CXX_FLAGS}")
 
+include_directories(${IFEM_INCLUDES} ../Common
+                    ${PROJECT_SOURCE_DIR}/PoroElastic)
+
 # Generate doxy in build tree
 if(EXISTS ${PROJECT_SOURCE_DIR}/doc/Doxyfile.in)
   CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/doc/Doxyfile.in Doxyfile @ONLY)
@@ -34,19 +37,25 @@ configure_file(${IFEM_REGTEST_SCRIPT} regtest.sh)
 
 include_directories(${IFEM_INCLUDES} ../Common ${PROJECT_SOURCE_DIR} ../Elasticity)
 
-if(NOT TARGET Elasticity)
-  add_subdirectory(../Elasticity Elasticity)
+if(NOT TARGET PoroElastic)
+  add_subdirectory(PoroElastic PoroElastic)
+endif()
+if(EXISTS ${PROJECT_SOURCE_DIR}/../IFEM-Elasticity)
+  if(NOT TARGET Elasticity)
+    add_subdirectory(../IFEM-Elasticity Elasticity)
+  endif()
+  include_directories(../IFEM-Elasticity)
+elseif(EXISTS ${PROJECT_SOURCE_DIR}/../Elasticity)
+  if(NOT TARGET Elasticity)
+    add_subdirectory(../Elasticity Elasticity)
+  endif()
+  include_directories(../Elasticity)
 endif()
 
-set(PoroElasticity_SRCS PoroElasticity.C PoroMaterial.C)
-
-add_library(CommonPoro STATIC ${PoroElasticity_SRCS})
-target_link_libraries(CommonPoro Elasticity)
-
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
+add_executable(PoroElasticity main.C)
 
-add_executable(PoroElasticity main_PoroElasticity.C)
-target_link_libraries(PoroElasticity CommonPoro Elasticity ${IFEM_LIBRARIES})
+target_link_libraries(PoroElasticity PoroElastic Elasticity ${IFEM_LIBRARIES})
 
 # Installation
 install(TARGETS PoroElasticity DESTINATION bin COMPONENT bin)
@@ -81,7 +90,7 @@ list(APPEND TEST_APPS PoroElasticity)
 IFEM_add_test_app(${PROJECT_SOURCE_DIR}/Test/*.C
                   ${PROJECT_SOURCE_DIR}/Test
                   PoroElasticity
-                  CommonPoro Elasticity ${IFEM_LIBRARIES})
+                  PoroElastic Elasticity ${IFEM_LIBRARIES})
 
 if(IFEM_COMMON_APP_BUILD)
   set(TEST_APPS ${TEST_APPS} PARENT_SCOPE)

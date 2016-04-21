@@ -7,7 +7,7 @@
 //!
 //! \author Arne Morten Kvarving / SINTEF
 //!
-//! \brief Class for poro-elastic material models.
+//! \brief Class for poroelastic material models.
 //!
 //==============================================================================
 
@@ -44,6 +44,10 @@ VecFunc* PoroMaterial::FuncConstPair<VecFunc>::parse(const char* val,
   return utl::parseVecFunc(val, type);
 }
 
+
+/*!
+  \brief Template function to parse a property value from and XML-element.
+*/
 
 template<class T>
 static bool propertyParse(PoroMaterial::FuncConstPair<T>& data,
@@ -235,6 +239,27 @@ bool PoroMaterial::evaluate (Matrix& Cmat, SymmTensor& sigma, double& U,
 
   if (iop == 3) // Calculate strain energy density, // U = 0.5*sigma:eps
     U = 0.5*sigma.innerProd(eps);
+
+  return true;
+}
+
+
+bool PoroMaterial::evaluate (double& lambda, double& mu,
+                             const FiniteElement& fe, const Vec3& X) const
+{
+  double E = Emod.evaluate(X);
+  double v = nu.evaluate(X);
+
+  if (v < 0.0 || v >= 0.5)
+  {
+    std::cerr <<" *** PoroMaterial::evaluate: Poisson's ratio "<< v
+              <<" out of range [0,0.5>."<< std::endl;
+    return false;
+  }
+
+  // Evaluate the Lame parameters
+  mu = 0.5*E/(1.0+v);
+  lambda = mu*v/(0.5-v);
 
   return true;
 }
