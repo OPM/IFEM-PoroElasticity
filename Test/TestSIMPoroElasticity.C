@@ -15,16 +15,19 @@
 
 #include "gtest/gtest.h"
 
+
 TEST(TestSIMPoroElasticity, Parse)
 {
-  SIMPoroElasticity<SIM2D> sim({2,1});
+  SIMPoroElasticity<SIM2D> sim;
   EXPECT_TRUE(sim.read("Plaxis1DVerif.xinp"));
 
-  const PoroElasticity& poro = static_cast<const PoroElasticity&>(*sim.getProblem());
+  const PoroElasticity* poro = static_cast<const PoroElasticity*>(sim.getProblem());
 
-  Vec3 grav = poro.getGravity();
-  ASSERT_FLOAT_EQ(grav[0], 0.0);
-  ASSERT_FLOAT_EQ(grav[1], 0.0);
-  ASSERT_FLOAT_EQ(grav[2], 0.0);
-  ASSERT_FLOAT_EQ(poro.getScaling(), 0.0);
+  Vec3 grav = poro->getGravity();
+  ASSERT_FLOAT_EQ(grav.x,0.0);
+  ASSERT_FLOAT_EQ(grav.y,0.0);
+  ASSERT_FLOAT_EQ(grav.z,0.0);
+  TimeDomain t;
+  t.dt = 1.0;
+  ASSERT_FLOAT_EQ(poro->getScaling(Vec3(), t), 920642222.26448686158677615343);
 }

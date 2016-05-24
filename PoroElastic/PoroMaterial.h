@@ -7,7 +7,7 @@
 //!
 //! \author Arne Morten Kvarving / SINTEF
 //!
-//! \brief Class for poro-elastic material models.
+//! \brief Class for poroelastic material models.
 //!
 //==============================================================================
 
@@ -16,6 +16,7 @@
 
 #include "MaterialBase.h"
 #include "Function.h"
+#include "MatVec.h"
 #include "Vec3.h"
 
 class TiXmlElement;
@@ -34,14 +35,13 @@ public:
     Function* function;                 //!< Function definition
     typename Function::Output constant; //!< Constant
 
-    //! \brief Constructor.
+    //! \brief Default constructor.
     FuncConstPair() { function = nullptr; constant = 0.0; }
 
-    //! \brief Parse an XML element. Specialized per function type.
+    //! \brief Parses an XML element. Specialized per function type.
     Function* parse(const char*, const std::string&) { return nullptr; }
 
-    //! \brief Evaluates the function.
-    //! \param[in] X the value to evaluate at.
+    //! \brief Evaluates the function at the given point \b X.
     typename Function::Output evaluate(const typename Function::Input& X) const
     {
       return function ? (*function)(X) : constant;
@@ -65,18 +65,26 @@ public:
   double getSolidDensity(const Vec3&) const;
   //! \brief Evaluates the mass density at current point.
   virtual double getMassDensity(const Vec3&) const;
-  //! \brief Evaluates the heat capacity for given temperature.
+  //! \brief Evaluates the effective heat capacity at the current point
   virtual double getHeatCapacity(double T) const;
-  //! \brief Evaluates the thermal conductivity for given temperature.
+  //! \brief Evaluates the heat capacity at the current point
+  double getFluidHeatCapacity(double T) const;
+  //! \brief Evaluates the heat capacity at the current point
+  double getSolidHeatCapacity(double T) const;
+  //! \brief Evaluates the effective thermal conductivity at the current point
   virtual double getThermalConductivity(double T) const;
-  //! \brief Evaluates the thermal expansion coefficient for given temperature.
-  virtual double getThermalExpansion(double T) const;
+  //! \brief Evaluates the thermal conductivity of the fluid at the current point
+  double getFluidThermalConductivity(double T) const;
+  //! \brief Evaluates the thermal conductivity of the solid at the current point
+  double getSolidThermalConductivity(double T) const;
+  //! \brief Evaluates the thermal expansion of the solid at the current point
+  double getSolidThermalExpansion(double T) const;
   //! \brief Returns porosity at the current point.
   double getPorosity(const Vec3& X) const;
   //! \brief Returns permeability at the current point.
   Vec3 getPermeability(const Vec3& X) const;
-  //! \brief Returns bulk modulus of the water at the current point.
-  double getBulkWater(const Vec3& X) const;
+  //! \brief Returns bulk modulus of the fluid at the current point.
+  double getBulkFluid(const Vec3& X) const;
   //! \brief Returns bulk modulus of the solid at the current point.
   double getBulkSolid(const Vec3& X) const;
   //! \brief Returns bulk modulus of the medium at the current point.
@@ -96,11 +104,26 @@ public:
   //!   0 : Calculate the constitutive matrix only,
   //!   1 : Calculate Cauchy stresses and the constitutive matrix,
   //!   3 : Calculate the strain energy density only.
-  virtual bool evaluate(Matrix& C, SymmTensor& sigma, double& U,
+  virtual bool evaluate(Matrix& Cmat, SymmTensor& sigma, double& U,
                         const FiniteElement&, const Vec3& X,
                         const Tensor&, const SymmTensor& eps,
                         char iop = 1, const TimeDomain* = nullptr,
                         const Tensor* = nullptr) const;
+
+  //! \brief Evaluates the Lame-parameters at an integration point.
+  //! \param[out] lambda Lame's first parameter
+  //! \param[out] mu Lame's second parameter (shear modulus)
+  //! \param[in] fe Finite element quantities at current point
+  //! \param[in] X Cartesian coordinates of current point
+  virtual bool evaluate(double& lambda, double& mu,
+                        const FiniteElement& fe, const Vec3& X) const;
+
+  //! \brief Get scaling factor.
+  //! \param X Point to evaluate parameters in
+  //! \param time Time stepping parameters
+  //! \param gacc Gravity acceleration
+  double getScaling(const Vec3& X, const TimeDomain& time,
+                    double gacc) const;
 
 protected:
   FuncConstPair<RealFunc> Emod; //!< Young's modulus
@@ -108,13 +131,15 @@ protected:
   FuncConstPair<RealFunc> rhof; //!< Fluid density
   FuncConstPair<RealFunc> rhos; //!< Solid density
 
-  FuncConstPair<ScalarFunc> thermalexpansion; //!< Thermal expansion coefficient
-  FuncConstPair<ScalarFunc> heatcapacity;     //!< Specific heat capacity
-  FuncConstPair<ScalarFunc> conductivity;     //!< Thermal conductivity
+  FuncConstPair<ScalarFunc> fheatcapacity; //!< Specific heat capacity for fluid
+  FuncConstPair<ScalarFunc> sheatcapacity; //!< Specific heat capacity for solid
+  FuncConstPair<ScalarFunc> fconductivity; //!< Thermal conductivity
+  FuncConstPair<ScalarFunc> sconductivity; //!< Thermal conductivity
+  FuncConstPair<ScalarFunc> sexpansion;    //!< Thermal expansion
 
   FuncConstPair<RealFunc> porosity;     //!< Porosity
   FuncConstPair<VecFunc>  permeability; //!< Permeability
-  FuncConstPair<RealFunc> bulkw;        //!< Bulk modulus of water
+  FuncConstPair<RealFunc> bulkf;        //!< Bulk modulus of fluid 
   FuncConstPair<RealFunc> bulks;        //!< Bulk modulus of solid
   FuncConstPair<RealFunc> bulkm;        //!< Bulk modulus of medium
 };

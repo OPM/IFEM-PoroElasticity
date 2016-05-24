@@ -7,7 +7,7 @@ Plaxis1DVerif-nonmixed.xinp -2D
 		Density of Fluid, rhof = 1000
 		Density of Solid, rhos = 2700
 	Bulk Moduli: 
-		Bulk Modulus of Water, Kw = 1e+99
+		Bulk Modulus of Fluid, Kf = 1e+99
 		Bulk Modulus of Solid, Ks = 1e+99
 		Bulk Modulus of Medium, Ko = 0
 	Porosity, n = 0.5

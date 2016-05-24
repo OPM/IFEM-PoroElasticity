@@ -4,15 +4,19 @@ cmake_minimum_required(VERSION 2.6)
 
 # Add local modules
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
-                      ${PROJECT_SOURCE_DIR}/../../cmake/Modules)
+                      ${PROJECT_SOURCE_DIR}/../../cmake/Modules
+                      $ENV{HOME}/cmake/Modules)
 
+# Required packages
 if(NOT IFEM_CONFIGURED)
   find_package(IFEM REQUIRED)
   include_directories(${IFEM_INCLUDE_DIRS})
   add_definitions(${IFEM_DEFINITIONS})
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IFEM_CXX_FLAGS}")
 endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IFEM_CXX_FLAGS}")
+include_directories(${IFEM_INCLUDES} ../Common ${PROJECT_SOURCE_DIR}
+                    ${PROJECT_SOURCE_DIR}/PoroElastic)
 
 # Generate doxy in build tree
 if(EXISTS ${PROJECT_SOURCE_DIR}/doc/Doxyfile.in)
@@ -29,24 +33,37 @@ if(EXISTS ${PROJECT_BINARY_DIR}/Doxyfile)
   add_dependencies(doc PoroElasticity-doc)
 endif()
 
-# Generate regtest script with correct paths
-configure_file(${IFEM_REGTEST_SCRIPT} regtest.sh)
-
-include_directories(${IFEM_INCLUDES} ../Common ${PROJECT_SOURCE_DIR} ../Elasticity)
-
-if(NOT TARGET Elasticity)
-  add_subdirectory(../Elasticity Elasticity)
-endif()
-
-set(PoroElasticity_SRCS PoroElasticity.C PoroMaterial.C)
-
-add_library(CommonPoro STATIC ${PoroElasticity_SRCS})
-target_link_libraries(CommonPoro Elasticity)
-
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
-add_executable(PoroElasticity main_PoroElasticity.C)
-target_link_libraries(PoroElasticity CommonPoro Elasticity ${IFEM_LIBRARIES})
+if(NOT WIN32)
+  # Emit position-independent code, suitable for dynamic linking
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+  # Enable all warnings
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+endif(NOT WIN32)
+
+if(NOT TARGET PoroElastic)
+  add_subdirectory(PoroElastic PoroElastic)
+endif()
+if(EXISTS ${PROJECT_SOURCE_DIR}/../IFEM-Elasticity)
+  if(NOT TARGET Elasticity)
+    add_subdirectory(../IFEM-Elasticity Elasticity)
+  endif()
+  include_directories(../IFEM-Elasticity)
+elseif(EXISTS ${PROJECT_SOURCE_DIR}/../Elasticity)
+  if(NOT TARGET Elasticity)
+    add_subdirectory(../Elasticity Elasticity)
+  endif()
+  include_directories(../Elasticity)
+endif()
+
+if(NOT TARGET IFEMAppCommon)
+  add_subdirectory(../Common CommonIFEM)
+endif()
+
+add_executable(PoroElasticity main.C)
+
+target_link_libraries(PoroElasticity PoroElastic Elasticity IFEMAppCommon ${IFEM_LIBRARIES})
 
 # Installation
 install(TARGETS PoroElasticity DESTINATION bin COMPONENT bin)
@@ -59,8 +76,12 @@ if(INSTALL_DOXY)
           PATTERN *.map EXCLUDE)
 endif(INSTALL_DOXY)
 
+# Testing
 enable_testing()
 include(IFEMTesting)
+
+# Generate regtest script with correct paths
+configure_file(${IFEM_REGTEST_SCRIPT} regtest.sh)
 
 # Regression tests
 if(IFEM_USE_PARALLEL_PETSC)
@@ -70,6 +91,7 @@ else()
   ifem_add_test(Plaxis1DVerif-nonmixed.reg PoroElasticity)
   ifem_add_test(OGSBenchmark1D.reg PoroElasticity)
   ifem_add_test(OGSBenchmark1D-nonmixed.reg PoroElasticity)
+  ifem_add_test(ThermalConsolidation.reg PoroElasticity)
   if(LRSpline_FOUND)
     ifem_add_test(Plaxis1DVerif-LR.reg PoroElasticity)
     ifem_add_test(OGSBenchmark1D-LR.reg PoroElasticity)
@@ -81,7 +103,7 @@ list(APPEND TEST_APPS PoroElasticity)
 IFEM_add_test_app(${PROJECT_SOURCE_DIR}/Test/*.C
                   ${PROJECT_SOURCE_DIR}/Test
                   PoroElasticity
-                  CommonPoro Elasticity ${IFEM_LIBRARIES})
+                  PoroElastic Elasticity ${IFEM_LIBRARIES})
 
 if(IFEM_COMMON_APP_BUILD)
   set(TEST_APPS ${TEST_APPS} PARENT_SCOPE)

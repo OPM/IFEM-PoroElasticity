@@ -7,7 +7,7 @@
 //!
 //! \author Arne Morten Kvarving / SINTEF
 //!
-//! \brief Class for poro-elastic material models.
+//! \brief Class for poroelastic material models.
 //!
 //==============================================================================
 
@@ -18,6 +18,7 @@
 #include "Vec3Oper.h"
 #include "MatVec.h"
 #include "IFEM.h"
+#include "TimeDomain.h"
 #include "tinyxml.h"
 
 
@@ -44,6 +45,10 @@ VecFunc* PoroMaterial::FuncConstPair<VecFunc>::parse(const char* val,
   return utl::parseVecFunc(val, type);
 }
 
+
+/*!
+  \brief Template function to parse a property value from an XML-element.
+*/
 
 template<class T>
 static bool propertyParse(PoroMaterial::FuncConstPair<T>& data,
@@ -79,13 +84,15 @@ void PoroMaterial::parse(const TiXmlElement* elem)
   propertyParse(rhof, elem, "rhof", "fluiddensity");
   propertyParse(rhos, elem, "rhos", "soliddensity");
 
-  propertyParse(thermalexpansion, elem, "alpha", "thermalexpansion");
-  propertyParse(heatcapacity, elem, "cp", "heatcapacity");
-  propertyParse(conductivity, elem, "kappa", "conductivity");
+  propertyParse(fheatcapacity, elem, "cpf", "fluidheatcapacity");
+  propertyParse(sheatcapacity, elem, "cps", "solidheatcapacity");
+  propertyParse(fconductivity, elem, "kappaf", "fluidconductivity");
+  propertyParse(sconductivity, elem, "kappas", "solidconductivity");
+  propertyParse(sexpansion, elem, "alphas", "solidexpansion");
 
   propertyParse(porosity, elem, "poro", "porosity");
   propertyParse(permeability, elem, "perm", "permeability");
-  propertyParse(bulkw, elem, "Kw", "waterbulk");
+  propertyParse(bulkf, elem, "Kf", "fluidbulk");
   propertyParse(bulks, elem, "Ks", "solidbulk");
   propertyParse(bulkm, elem, "Ko", "mediumbulk");
 }
@@ -100,28 +107,63 @@ void PoroMaterial::printLog() const
              <<"\n\t\tDensity of Fluid, rhof = "<< rhof.constant
              <<"\n\t\tDensity of Solid, rhos = "<< rhos.constant;
   IFEM::cout <<"\n\tBulk Moduli: "
-             <<"\n\t\tBulk Modulus of Water, Kw = "<< bulkw.constant
+             <<"\n\t\tBulk Modulus of Fluid, Kf = "<< bulkf.constant
              <<"\n\t\tBulk Modulus of Solid, Ks = "<< bulks.constant
              <<"\n\t\tBulk Modulus of Medium, Ko = "<< bulkm.constant;
   IFEM::cout <<"\n\tPorosity, n = "<< porosity.constant << std::endl;
-}
 
-
-double PoroMaterial::getThermalExpansion (double T) const
-{
-  return thermalexpansion.evaluate(T);
+  if (fheatcapacity.constant != 0.0)
+    IFEM::cout << "\tThermal properties:"
+               << "\n\t\tHeat capacity of Fluid, cpf = " << fheatcapacity.constant
+               << "\n\t\tHeat capacity of Solid, cps = " << sheatcapacity.constant
+               << "\n\t\tHeat conductivty of Fluid, kappaf = "<< fconductivity.constant
+               << "\n\t\tHeat conductivty of Solid, kappas = "<< sconductivity.constant << std::endl;
 }
 
 
 double PoroMaterial::getHeatCapacity (double T) const
 {
-  return heatcapacity.evaluate(T);
+  Vec3 X;
+  return getPorosity(X)*getFluidDensity(X)*getFluidHeatCapacity(T) +
+         (1.0-getPorosity(X))*getSolidDensity(X)*getSolidHeatCapacity(T);
+}
+
+
+double PoroMaterial::getFluidHeatCapacity (double T) const
+{
+  return fheatcapacity.evaluate(T);
+}
+
+
+double PoroMaterial::getSolidHeatCapacity (double T) const
+{
+  return sheatcapacity.evaluate(T);
+}
+
+
+double PoroMaterial::getFluidThermalConductivity(double T) const
+{
+  return fconductivity.evaluate(T);
+}
+
+
+double PoroMaterial::getSolidThermalConductivity(double T) const
+{
+  return sconductivity.evaluate(T);
 }
 
 
 double PoroMaterial::getThermalConductivity(double T) const
 {
-  return conductivity.evaluate(T);
+  Vec3 X;
+  return pow(getFluidThermalConductivity(T),getPorosity(X))*
+         pow(getSolidThermalConductivity(T),1.0-getPorosity(X));
+}
+
+
+double PoroMaterial::getSolidThermalExpansion(double T) const
+{
+  return sexpansion.evaluate(T);
 }
 
 
@@ -156,9 +198,9 @@ double PoroMaterial::getMassDensity(const Vec3& X) const
 }
 
 
-double PoroMaterial::getBulkWater(const Vec3& X) const
+double PoroMaterial::getBulkFluid(const Vec3& X) const
 {
-  return bulkw.evaluate(X);
+  return bulkf.evaluate(X);
 }
 
 
@@ -237,4 +279,35 @@ bool PoroMaterial::evaluate (Matrix& Cmat, SymmTensor& sigma, double& U,
     U = 0.5*sigma.innerProd(eps);
 
   return true;
+}
+
+
+bool PoroMaterial::evaluate (double& lambda, double& mu,
+                             const FiniteElement& fe, const Vec3& X) const
+{
+  double E = Emod.evaluate(X);
+  double v = nu.evaluate(X);
+
+  if (v < 0.0 || v >= 0.5)
+  {
+    std::cerr <<" *** PoroMaterial::evaluate: Poisson's ratio "<< v
+              <<" out of range [0,0.5>."<< std::endl;
+    return false;
+  }
+
+  // Evaluate the Lame parameters
+  mu = 0.5*E/(1.0+v);
+  lambda = mu*v/(0.5-v);
+
+  return true;
+}
+
+
+double PoroMaterial::getScaling(const Vec3& X,
+                                const TimeDomain& time,
+                                double gacc) const
+{
+  double rhog = getFluidDensity(X) * gacc;
+  Vec3 permeability = getPermeability(X);
+  return sqrt(getStiffness(X)*rhog / permeability.x / time.dt);
 }

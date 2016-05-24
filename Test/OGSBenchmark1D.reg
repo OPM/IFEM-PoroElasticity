@@ -6,7 +6,7 @@ OGSBenchmark1D.xinp -2D -mixed
 Elasticity: 2D, gravity = 0 0
 	Density of Fluid, rhof = 1000
 	Density of Solid, rhos = 2700
-	Bulk Modulus of Water, Kw = 1e+99
+	Bulk Modulus of Fluid, Kf = 1e+99
 	Bulk Modulus of Solid, Ks = 1e+99
 	Bulk Modulus of Medium, Ko = 0
 	Young's Modulus, E = 30000
@@ -19,10 +19,12 @@ Number of D-dofs      192
 Number of P-dofs      69
 Number of unknowns    204
   step = 1  time = 3.33
-  Primary solution summary: L2-norm            : 0.00308775
+  Primary solution summary: L2-norm            : 0.000700444
+                   Pressure L2-norm            : 0.00300726
                             Max Y-displacement : 0.00316079
                             Max pressure       : 0.00333116
   step = 2  time = 6.66
-  Primary solution summary: L2-norm            : 0.00310444
+  Primary solution summary: L2-norm            : 0.0011574
+                   Pressure L2-norm            : 0.00288062
                             Max Y-displacement : 0.004741
                             Max pressure       : 0.00332878

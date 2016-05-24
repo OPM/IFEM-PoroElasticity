@@ -36,7 +36,7 @@ TEST(TestPoroMaterial, Parse)
   ASSERT_FLOAT_EQ(mat.getPorosity(X), 0.5);
   ASSERT_FLOAT_EQ(mat.getStiffness(X), 1000000.0);
   ASSERT_FLOAT_EQ(mat.getPoisson(X), 0.0);
-  ASSERT_FLOAT_EQ(mat.getBulkWater(X), 1e99);
+  ASSERT_FLOAT_EQ(mat.getBulkFluid(X), 1e99);
   ASSERT_FLOAT_EQ(mat.getBulkSolid(X), 1e99);
   ASSERT_FLOAT_EQ(mat.getBulkMedium(X), 0.0);
   Vec3 perm = mat.getPermeability(X);
