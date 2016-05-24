@@ -7,6 +7,10 @@ include_directories(${PROJECT_SOURCE_DIR}/..
 
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
 
-file(GLOB PoroEl_SOURCES *.C)
-file(GLOB PoroEl_HEADERS *.h)
+set(PoroEl_SOURCES PoroElasticity.C
+                   PoroMaterial.C
+                   PoroMats.C
+                   PoroSolutions.C
+                   ThermoPoroElasticity.C)
+
 add_library(PoroElastic STATIC ${PoroEl_SOURCES})

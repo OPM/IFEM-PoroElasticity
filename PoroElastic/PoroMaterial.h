@@ -16,6 +16,7 @@
 
 #include "MaterialBase.h"
 #include "Function.h"
+#include "MatVec.h"
 #include "Vec3.h"
 
 class TiXmlElement;
@@ -64,12 +65,20 @@ public:
   double getSolidDensity(const Vec3&) const;
   //! \brief Evaluates the mass density at current point.
   virtual double getMassDensity(const Vec3&) const;
-  //! \brief Evaluates the heat capacity for given temperature.
+  //! \brief Evaluates the effective heat capacity at the current point
   virtual double getHeatCapacity(double T) const;
-  //! \brief Evaluates the thermal conductivity for given temperature.
+  //! \brief Evaluates the heat capacity at the current point
+  double getFluidHeatCapacity(double T) const;
+  //! \brief Evaluates the heat capacity at the current point
+  double getSolidHeatCapacity(double T) const;
+  //! \brief Evaluates the effective thermal conductivity at the current point
   virtual double getThermalConductivity(double T) const;
-  //! \brief Evaluates the thermal expansion coefficient for given temperature.
-  virtual double getThermalExpansion(double T) const;
+  //! \brief Evaluates the thermal conductivity of the fluid at the current point
+  double getFluidThermalConductivity(double T) const;
+  //! \brief Evaluates the thermal conductivity of the solid at the current point
+  double getSolidThermalConductivity(double T) const;
+  //! \brief Evaluates the thermal expansion of the solid at the current point
+  double getSolidThermalExpansion(double T) const;
   //! \brief Returns porosity at the current point.
   double getPorosity(const Vec3& X) const;
   //! \brief Returns permeability at the current point.
@@ -122,9 +131,11 @@ protected:
   FuncConstPair<RealFunc> rhof; //!< Fluid density
   FuncConstPair<RealFunc> rhos; //!< Solid density
 
-  FuncConstPair<ScalarFunc> thermalexpansion; //!< Thermal expansion coefficient
-  FuncConstPair<ScalarFunc> heatcapacity;     //!< Specific heat capacity
-  FuncConstPair<ScalarFunc> conductivity;     //!< Thermal conductivity
+  FuncConstPair<ScalarFunc> fheatcapacity; //!< Specific heat capacity for fluid
+  FuncConstPair<ScalarFunc> sheatcapacity; //!< Specific heat capacity for solid
+  FuncConstPair<ScalarFunc> fconductivity; //!< Thermal conductivity
+  FuncConstPair<ScalarFunc> sconductivity; //!< Thermal conductivity
+  FuncConstPair<ScalarFunc> sexpansion;    //!< Thermal expansion
 
   FuncConstPair<RealFunc> porosity;     //!< Porosity
   FuncConstPair<VecFunc>  permeability; //!< Permeability

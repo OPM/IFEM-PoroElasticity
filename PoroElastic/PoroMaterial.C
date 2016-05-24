@@ -84,9 +84,11 @@ void PoroMaterial::parse(const TiXmlElement* elem)
   propertyParse(rhof, elem, "rhof", "fluiddensity");
   propertyParse(rhos, elem, "rhos", "soliddensity");
 
-  propertyParse(thermalexpansion, elem, "alpha", "thermalexpansion");
-  propertyParse(heatcapacity, elem, "cp", "heatcapacity");
-  propertyParse(conductivity, elem, "kappa", "conductivity");
+  propertyParse(fheatcapacity, elem, "cpf", "fluidheatcapacity");
+  propertyParse(sheatcapacity, elem, "cps", "solidheatcapacity");
+  propertyParse(fconductivity, elem, "kappaf", "fluidconductivity");
+  propertyParse(sconductivity, elem, "kappas", "solidconductivity");
+  propertyParse(sexpansion, elem, "alphas", "solidexpansion");
 
   propertyParse(porosity, elem, "poro", "porosity");
   propertyParse(permeability, elem, "perm", "permeability");
@@ -109,24 +111,59 @@ void PoroMaterial::printLog() const
              <<"\n\t\tBulk Modulus of Solid, Ks = "<< bulks.constant
              <<"\n\t\tBulk Modulus of Medium, Ko = "<< bulkm.constant;
   IFEM::cout <<"\n\tPorosity, n = "<< porosity.constant << std::endl;
-}
 
-
-double PoroMaterial::getThermalExpansion (double T) const
-{
-  return thermalexpansion.evaluate(T);
+  if (fheatcapacity.constant != 0.0)
+    IFEM::cout << "\tThermal properties:"
+               << "\n\t\tHeat capacity of Fluid, cpf = " << fheatcapacity.constant
+               << "\n\t\tHeat capacity of Solid, cps = " << sheatcapacity.constant
+               << "\n\t\tHeat conductivty of Fluid, kappaf = "<< fconductivity.constant
+               << "\n\t\tHeat conductivty of Solid, kappas = "<< sconductivity.constant << std::endl;
 }
 
 
 double PoroMaterial::getHeatCapacity (double T) const
 {
-  return heatcapacity.evaluate(T);
+  Vec3 X;
+  return getPorosity(X)*getFluidDensity(X)*getFluidHeatCapacity(T) +
+         (1.0-getPorosity(X))*getSolidDensity(X)*getSolidHeatCapacity(T);
+}
+
+
+double PoroMaterial::getFluidHeatCapacity (double T) const
+{
+  return fheatcapacity.evaluate(T);
+}
+
+
+double PoroMaterial::getSolidHeatCapacity (double T) const
+{
+  return sheatcapacity.evaluate(T);
+}
+
+
+double PoroMaterial::getFluidThermalConductivity(double T) const
+{
+  return fconductivity.evaluate(T);
+}
+
+
+double PoroMaterial::getSolidThermalConductivity(double T) const
+{
+  return sconductivity.evaluate(T);
 }
 
 
 double PoroMaterial::getThermalConductivity(double T) const
 {
-  return conductivity.evaluate(T);
+  Vec3 X;
+  return pow(getFluidThermalConductivity(T),getPorosity(X))*
+         pow(getSolidThermalConductivity(T),1.0-getPorosity(X));
+}
+
+
+double PoroMaterial::getSolidThermalExpansion(double T) const
+{
+  return sexpansion.evaluate(T);
 }
 
 

@@ -57,9 +57,13 @@ elseif(EXISTS ${PROJECT_SOURCE_DIR}/../Elasticity)
   include_directories(../Elasticity)
 endif()
 
+if(NOT TARGET IFEMAppCommon)
+  add_subdirectory(../Common CommonIFEM)
+endif()
+
 add_executable(PoroElasticity main.C)
 
-target_link_libraries(PoroElasticity PoroElastic Elasticity ${IFEM_LIBRARIES})
+target_link_libraries(PoroElasticity PoroElastic Elasticity IFEMAppCommon ${IFEM_LIBRARIES})
 
 # Installation
 install(TARGETS PoroElasticity DESTINATION bin COMPONENT bin)
@@ -87,6 +91,7 @@ else()
   ifem_add_test(Plaxis1DVerif-nonmixed.reg PoroElasticity)
   ifem_add_test(OGSBenchmark1D.reg PoroElasticity)
   ifem_add_test(OGSBenchmark1D-nonmixed.reg PoroElasticity)
+  ifem_add_test(ThermalConsolidation.reg PoroElasticity)
   if(LRSpline_FOUND)
     ifem_add_test(Plaxis1DVerif-LR.reg PoroElasticity)
     ifem_add_test(OGSBenchmark1D-LR.reg PoroElasticity)

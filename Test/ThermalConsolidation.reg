@@ -1,0 +1,82 @@
+ThermalConsolidation.xinp -2D -mixed -thermal
+
+	Constitutive Properties:
+		Young's Modulus, E = 6e+06
+		Poisson's Ratio, nu = 0.4
+	Densities:
+		Density of Fluid, rhof = 1000
+		Density of Solid, rhos = 2200
+	Bulk Moduli:
+		Bulk Modulus of Fluid, Kf = 1e+99
+		Bulk Modulus of Solid, Ks = 1e+99
+		Bulk Modulus of Medium, Ko = 0
+	Porosity, n = 0.4
+	Thermal properties:
+		Heat capacity of Fluid, cpf = 200
+		Heat capacity of Solid, cps = 61.24
+		Heat conductivty of Fluid, kappaf = 0.6
+		Heat conductivty of Solid, kappas = 105000
+	Initial condition function: 0.0
+	Time level: 0
+	Initial condition function: 0.0
+	Time level: 0
+	Scaling values:
+		Scale U-P = 1	Scale U-T = 1
+
+Number of elements    126
+Number of nodes       338
+Number of dofs        676
+Number of D-dofs      368
+Number of P-dofs      308
+Number of constraints 7
+Number of unknowns    602
+  step=1  time=0.1
+  Primary solution summary: L2-norm            : 698.193
+                            Max Y-displacement : 5.49116e-06
+                            Max pressure       : 1238.85
+                            Max temperature    : 50
+  step=2  time=0.2
+  Primary solution summary: L2-norm            : 697.38
+                            Max Y-displacement : 5.89126e-06
+                            Max pressure       : 1211.16
+                            Max temperature    : 50
+  step=3  time=0.3
+  Primary solution summary: L2-norm            : 696.624
+                            Max Y-displacement : 6.27955e-06
+                            Max pressure       : 1184.8
+                            Max temperature    : 50
+  step=4  time=0.4
+  Primary solution summary: L2-norm            : 695.918
+                            Max Y-displacement : 6.65667e-06
+                            Max pressure       : 1159.69
+                            Max temperature    : 50
+  step=5  time=0.5
+  Primary solution summary: L2-norm            : 695.255
+                            Max Y-displacement : 7.02323e-06
+                            Max pressure       : 1135.75
+                            Max temperature    : 50
+  step=6  time=0.6
+  Primary solution summary: L2-norm            : 694.631
+                            Max Y-displacement : 7.37978e-06
+                            Max pressure       : 1112.9
+                            Max temperature    : 50
+  step=7  time=0.7
+  Primary solution summary: L2-norm            : 694.043
+                            Max Y-displacement : 7.72686e-06
+                            Max pressure       : 1091.09
+                            Max temperature    : 50
+  step=8  time=0.8
+  Primary solution summary: L2-norm            : 693.485
+                            Max Y-displacement : 8.06496e-06
+                            Max pressure       : 1070.26
+                            Max temperature    : 50
+  step=9  time=0.9
+  Primary solution summary: L2-norm            : 692.956
+                            Max Y-displacement : 8.39454e-06
+                            Max pressure       : 1050.34
+                            Max temperature    : 50
+  step=10  time=1
+  Primary solution summary: L2-norm            : 692.451
+                            Max Y-displacement : 8.71603e-06
+                            Max pressure       : 1031.28
+                            Max temperature    : 50

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<simulation>
+  <!-- General - geometry definitions !-->
+  <geometry Lx="2.0" Ly="7.0">
+    <refine type="uniform" patch="1" u="5" v="20"/>
+    <topologysets>
+      <set name="Vertical" type="edge">
+        <item patch="1">1 2</item>
+      </set>
+      <set name="Bottom" type="edge">
+        <item patch="1">3</item>
+      </set>
+      <set name="Top" type="edge">
+        <item patch="1">4</item>
+      </set>
+    </topologysets>
+  </geometry>
+
+  <boundaryconditions>
+    <dirichlet set="Vertical" basis="1" comp="1"/>
+    <dirichlet set="Bottom" basis="1" comp="1"/>
+    <dirichlet set="Bottom" basis="1" comp="2"/>
+    <dirichlet set="Top" basis="2" comp="1"/>
+    <dirichlet set="Top" basis="2" comp="2">50.0</dirichlet>
+    <neumann set="Top" basis="1" direction="0" type="expression">if(below(t,0.0001),-1000.0*t/0.0001,-1000.0)</neumann>
+  </boundaryconditions>
+
+  <!-- Problem-specific block !-->
+  <thermoporoelasticity>
+    <materialdata poro="0.4"
+                  E="6.0e6" nu="0.4"
+                  rhof="1000.0" rhos="2200.0"
+                  Kf="1e99" Ks="1e99" Ko="0"
+                  perm="8.04e-6 8.04e-6 0.0"
+                  cpf="200.0" cps="61.24"
+                  kappaf="0.6" kappas="1.05e5"
+                  alphas="0.9e-6"/>
+    <initialcondition field="vector" type="expression" basis="2" component="1" level="0">0.0</initialcondition>
+    <initialcondition field="vector" type="expression" basis="2" component="2" level="0">0.0</initialcondition>
+    <nonlinearsolver>
+      <maxits>10</maxits>
+      <rtol>1.0e-6</rtol>
+    </nonlinearsolver>
+    <scaling scl1="1.0e0" scl2="1.0e0"/>
+  </thermoporoelasticity>
+
+  <timestepping start="0.0" end="1.0" dt="0.1"/>
+
+</simulation>
