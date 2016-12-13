@@ -101,25 +101,19 @@ public:
       pNorm = this->solutionNorms(solution,dMax+nsd,iMax+nsd,
                                   this->getNoFields(2),'P');
 
-    std::stringstream str;
-    if (this->adm.getProcId() == 0)
-    {
-      str <<"  Primary solution summary: L2-norm            : "
-          << utl::trunc(dNorm);
-      if (pNorm != 0.0)
-        str <<"\n                   Pressure L2-norm            : "<< pNorm;
+    IFEM::cout <<"  Primary solution summary: L2-norm            : "
+               << utl::trunc(dNorm);
+    if (pNorm != 0.0)
+      IFEM::cout <<"\n                   Pressure L2-norm            : "<< pNorm;
 
-      char D = 'X';
-      for (size_t d = 0; d < nsd; d++, D++)
-        if (utl::trunc(dMax[d]) != 0.0)
-          str <<"\n                            Max "<< char('X'+d)
-              <<"-displacement : "<< dMax[d] <<" node "<< iMax[d];
-      if (utl::trunc(dMax[nsd]) != 0.0)
-        str <<"\n                            Max pressure       : "
-            << dMax[nsd] <<" node "<< iMax[nsd] <<"\n";
-    }
-
-    utl::printSyncronized(std::cout,str,this->adm.getProcId());
+    char D = 'X';
+    for (size_t d = 0; d < nsd; d++, D++)
+      if (utl::trunc(dMax[d]) != 0.0)
+        IFEM::cout <<"\n                            Max "<< char('X'+d)
+                   <<"-displacement : "<< dMax[d] <<" node "<< iMax[d];
+    if (utl::trunc(dMax[nsd]) != 0.0)
+      IFEM::cout <<"\n                            Max pressure       : "
+                 << dMax[nsd] <<" node "<< iMax[nsd] <<"\n";
   }
 
   //! \brief Computes energy norms on the converged solution.
