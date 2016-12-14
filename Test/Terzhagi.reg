@@ -6,7 +6,7 @@ Number of Gauss points: 4
 1. Poroelasticity solver
 Parsing input file Terzhagi.xinp
 Parsing <geometry>
-  Using default linear geometry basis on unit domain \[0,1]^2
+  Generating linear geometry on unit parameter domain \[0,1\]^2
   Parsing <refine>
   Parsing <topologysets>
 	Topology sets: Bottom (1,3,1D)
