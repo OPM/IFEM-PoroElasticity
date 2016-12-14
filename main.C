@@ -17,7 +17,6 @@
 #include "SIMDynPoroElasticity.h"
 #include "SIMSolver.h"
 #include "GenAlphaSIM.h"
-#include "InitialConditionHandler.h"
 #include "AppCommon.h"
 #include "Profiler.h"
 
@@ -59,7 +58,7 @@ template<class Dim, class Sim> int runSimulator (char* infile)
 
   // Initialize the solution fields
   model.init(TimeStep());
-  SIM::setInitialConditions(model);
+  model.setInitialConditions();
 
   // HDF5 output
   DataExporter* exporter = nullptr;
