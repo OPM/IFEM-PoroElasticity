@@ -40,7 +40,7 @@ PoroElasticity::Mats::Mats (size_t ndof_displ, size_t ndof_press,
     A[pp_P].resize(ndof_press, ndof_press);
   }
 
-  h = 0.0;
+  h = lambda = 0.0;
 }
 
 

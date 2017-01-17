@@ -17,6 +17,7 @@
 #include "ElmNorm.h"
 #include "TimeDomain.h"
 #include "Utilities.h"
+#include "Functions.h"
 #include "AnaSol.h"
 #include "Tensor.h"
 #include "IFEM.h"
@@ -28,6 +29,7 @@ PoroElasticity::PoroElasticity (unsigned short int n) : Elasticity(n)
   sc = 0.0;
   gravity[n-1] = 9.81; // Default gravity acceleration
   calculateEnergy = useDynCoupling = false;
+  volumeFlux = nullptr;
 }
 
 
@@ -37,6 +39,11 @@ bool PoroElasticity::parse (const TiXmlElement* elem)
     calculateEnergy = true;
   else if (!strncasecmp(elem->Value(),"useDynC",7))
     useDynCoupling = true;
+  else if (!strncasecmp(elem->Value(),"volumeflux",10)) {
+    std::string type;
+    utl::getAttribute(elem,"type",type);
+    volumeFlux = utl::parseRealFunc(elem->GetText(),type);
+  }
   else if (strcasecmp(elem->Value(),"scaling"))
     return this->Elasticity::parse(elem);
   else if (utl::getAttribute(elem,"value",sc))
@@ -251,30 +258,48 @@ bool PoroElasticity::evalCompressibilityMatrix (Matrix& mx, const Vector& N,
 }
 
 
-bool PoroElasticity::evalPermeabilityMatrix (Matrix& mx, const Matrix& dNdX,
-                                             const Vec3& permeability,
+void PoroElasticity::evalPermeabilityMatrix (Matrix& mx, const Matrix& dNdX,
+                                             const SymmTensor& K,
                                              double scl) const
 {
   for (size_t i = 1; i <= dNdX.rows(); i++)
     for (size_t j = 1; j <= dNdX.rows(); j++)
       for (size_t k = 1; k <= nsd; k++)
-        mx(i,j) += scl * permeability[k-1] * dNdX(i,k) * dNdX(j,k);
-
-  return true;
+        for (size_t l = 1; l <= nsd; l++)
+          mx(i,j) += scl * dNdX(i,k) * K(k,l) * dNdX(j,l);
 }
 
-bool PoroElasticity::evalDynamicCouplingMatrix(Matrix& mx, const Vector& Nu,
-                                               const Matrix& dNpdx,
-                                               const Vec3& permeability,
-                                               double scl) const
+
+void PoroElasticity::evalDynCouplingMatrix (Matrix& mx, const Vector& Nu,
+                                            const Matrix& dNpdx,
+                                            const SymmTensor& K,
+                                            double scl) const
 {
   for (size_t i = 1; i <= dNpdx.rows(); i++)
     for (size_t j = 1; j <= Nu.size(); j++)
       for (size_t k = 1; k <= nsd; k++)
-        mx(nsd*(j-1) + k, i) += dNpdx(i,k) * permeability[k-1] * Nu(j) * scl;
+        for (size_t l = 1; l <= nsd; l++)
+          mx(nsd*(j-1) + k, i) += dNpdx(i,k) * K(k,l) * Nu(j) * scl;
+}
+
+
+bool PoroElasticity::formPermeabilityTensor (SymmTensor& K,
+                                             const Vectors&,
+                                             const FiniteElement&,
+                                             const Vec3& X) const
+{
+  const PoroMaterial* pmat = dynamic_cast<const PoroMaterial*>(material);
+  if (!pmat) return false;
+
+  Vec3 permeability = pmat->getPermeability(X);
+
+  K.zero();
+  for (size_t i = 1; i <= K.dim(); i++)
+    K(i,i) = permeability(i);
 
   return true;
 }
+
 
 bool PoroElasticity::evalInt (LocalIntegral& elmInt,
                               const FiniteElement& fe,
@@ -290,8 +315,9 @@ bool PoroElasticity::evalInt (LocalIntegral& elmInt,
   if (!this->formBmatrix(Bmat,fe.dNdX))
     return false;
 
-  // Evaluate the permeability
-  Vec3 permeability = pmat->getPermeability(X);
+  SymmTensor Kperm(nsd); // Evaluate the permeability tensor
+  if (!this->formPermeabilityTensor(Kperm,elmInt.vec,fe,X))
+    return false;
 
   // Evaluate other material parameters
   double rhog  = pmat->getFluidDensity(X) * gravity.length();
@@ -307,8 +333,11 @@ bool PoroElasticity::evalInt (LocalIntegral& elmInt,
     this->formMassMatrix(elMat.A[uu_M], fe.basis(1), X, fe.detJxW);
 
   if (!elMat.A[up_D].empty())
-    this->evalDynamicCouplingMatrix(elMat.A[up_D], fe.basis(1), fe.grad(2),
-                                    permeability, scl / rhog * fe.detJxW);
+    this->evalDynCouplingMatrix(elMat.A[up_D], fe.basis(1), fe.grad(2),
+                                Kperm, scl / rhog * fe.detJxW);
+
+  this->evalPermeabilityMatrix(elMat.A[pp_P], fe.grad(2),
+                               Kperm, scl*scl/rhog*fe.detJxW);
 
   if (!this->evalElasticityMatrices(elMat, Bmat, fe, X))
     return false;
@@ -321,8 +350,10 @@ bool PoroElasticity::evalInt (LocalIntegral& elmInt,
                                        scl*scl*Minv*fe.detJxW))
     return false;
 
-  return this->evalPermeabilityMatrix(elMat.A[pp_P], fe.grad(2),
-                                      permeability, scl*scl/rhog*fe.detJxW);
+  if (volumeFlux)
+    elMat.b[Fp].add(fe.basis(2),(*volumeFlux)(X)*fe.detJxW);
+
+  return true;
 }
 
 

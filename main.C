@@ -99,15 +99,14 @@ int main (int argc, char ** argv)
   Profiler prof(argv[0]);
   utl::profiler->start("Initialization");
 
-  int i;
-  char* infile = 0;
+  char* infile = nullptr;
   char integrator = 0;
   bool twoD = false;
   ASMmxBase::Type = ASMmxBase::NONE;
 
-  IFEM::Init(argc,argv);
+  IFEM::Init(argc,argv,"Poroelasticity solver");
 
-  for (i = 1; i < argc; i++)
+  for (int i = 1; i < argc; i++)
     if (SIMoptions::ignoreOldOptions(argc,argv,i))
       ; // ignore the obsolete option
     else if (!strcmp(argv[i],"-2D"))
@@ -133,11 +132,7 @@ int main (int argc, char ** argv)
     return 0;
   }
 
-  IFEM::cout <<"\n >>> IFEM Poroelasticity Solver <<<"
-             <<"\n =================================="
-             <<"\n Executing command:\n";
-  for (i = 0; i < argc; i++) IFEM::cout <<" "<< argv[i];
-  IFEM::cout <<"\n\n Input file: "<< infile;
+  IFEM::cout <<"\n Input file: "<< infile;
   IFEM::getOptions().print(IFEM::cout);
   IFEM::cout << std::endl;
 

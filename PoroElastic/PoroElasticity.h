@@ -82,6 +82,8 @@ protected:
     virtual ~Mats() {}
     //! \brief Updates the time step size.
     void setStepSize(double dt) { h = dt; }
+    //! \brief Updates the perpendicular crack stretch.
+    void setCrackStretch(double cs) { lambda = cs; }
     //! \brief Returns the element level Newton matrix.
     virtual const Matrix& getNewtonMatrix() const;
     //! \brief Returns the element level right-hand-side vector.
@@ -97,7 +99,8 @@ protected:
     //! \brief Forms a system vector out of two sub-vectors
     virtual void form_vector(const Vector &u, const Vector &p, Vector& target) const = 0;
   protected:
-    double h;
+    double h;      //!< Current time step size
+    double lambda; //!< Perpendicular crack stretch at current location
   };
 
 private:
@@ -377,12 +380,12 @@ private:
   bool evalCompressibilityMatrix(Matrix& mx, const Vector& N, double scl) const;
 
   //! \brief Computes the permeability matrix for a quadrature point.
-  bool evalPermeabilityMatrix(Matrix& mx, const Matrix& dNdX,
-                              const Vec3& permeability, double scl) const;
+  void evalPermeabilityMatrix(Matrix& mx, const Matrix& dNdX,
+                              const SymmTensor& K, double scl) const;
 
   //! \brief Computes the dynamic coupling matrix for a quadrature point.
-  bool evalDynamicCouplingMatrix(Matrix& mx, const Vector& Nu, const Matrix& dNpdx,
-                                 const Vec3& permeability, double scl) const;
+  void evalDynCouplingMatrix(Matrix& mx, const Vector& Nu, const Matrix& dNpdx,
+                             const SymmTensor& K, double scl) const;
 
 protected:
   //! \brief Computes the elasticity matrices for a quadrature point.
@@ -394,11 +397,23 @@ protected:
                                       const FiniteElement& fe,
                                       const Vec3& X) const;
 
+  //! \brief Evaluates the permeability tensor at a quadrature point.
+  //! \param[out] K The permeability tensor
+  //! \param[in] eV Element solution vectors
+  //! \param[in] fe Finite element data of current integration point
+  //! \param[in] X Cartesian coordinates of current integration point
+  virtual bool formPermeabilityTensor(SymmTensor& Kperm,
+                                      const Vectors& eV,
+                                      const FiniteElement& fe,
+                                      const Vec3& X) const;
+
 private:
   double sc; //!< Scaling factor
 
   bool calculateEnergy; //!< If \e true, perform energy norm calculation
   bool useDynCoupling;  //!< If \e true, include the dynamic coupling matrix
+
+  RealFunc* volumeFlux; //!< Applied volumetric flux
 
   friend class PoroNorm;
 };
