@@ -492,21 +492,21 @@ NormBase* PoroElasticity::getNormIntegrand (AnaSol* sol) const
 
   if (sol)
     return new PoroNorm(*const_cast<PoroElasticity*>(this),
-                        sol->getVectorSol(), sol->getVectorSecSol(),
-                        sol->getScalarSol(), sol->getScalarSecSol());
+                        sol->getVectorSol(),// sol->getVectorSecSol(),
+                        sol->getScalarSol()/*, sol->getScalarSecSol()*/);
 
   return new PoroNorm(*const_cast<PoroElasticity*>(this));
 }
 
 
 PoroNorm::PoroNorm(PoroElasticity& poroel,
-                   VecFunc* disp, TensorFunc* d_disp,
-                   RealFunc* press, VecFunc* d_press)
+                   VecFunc* disp, /*TensorFunc* d_disp,*/
+                   RealFunc* press/*, VecFunc* d_press*/)
   : NormBase(poroel)
   , displacement(disp)
-  , d_displacement(d_disp)
+//  , d_displacement(d_disp)
   , pressure(press)
-  , d_pressure(d_press)
+//  , d_pressure(d_press)
 {
   nrcmp = 2;
 }
