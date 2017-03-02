@@ -135,6 +135,27 @@ public:
     return ok;
   }
 
+  //! \brief Initializes for integration of Neumann terms for a given property.
+  //! \param[in] propInd Physical property index
+  virtual bool initNeumann(size_t propInd)
+  {
+    PoroElasticity *prob = dynamic_cast<PoroElasticity*>(Dim::myProblem);
+    if (!prob) return false;
+
+    // If we find a real function, then it's a flux boundary term
+    typename Dim::SclFuncMap::const_iterator rit = Dim::myScalars.find(propInd);
+    if (rit != Dim::myScalars.end()) {
+      prob->setBoundaryFlux(rit->second);
+      prob->setTraction((TractionFunc*)nullptr);
+      prob->setTraction((VecFunc*)nullptr);
+      return true;
+    }
+
+    // If not, let parent class try to find a traction or vector term
+    prob->setBoundaryFlux(nullptr);
+    return this->SIMElasticityWrap<Dim>::initNeumann(propInd);
+  }
+
 protected:
   //! \brief Returns the actual integrand.
   virtual Elasticity* getIntegrand()

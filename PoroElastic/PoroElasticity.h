@@ -252,6 +252,9 @@ public:
   //! \param[in] mode The solution mode to use
   virtual void setMode(SIM::SolutionMode mode);
 
+  //! \brief Sets the boundary flux field
+  virtual void setBoundaryFlux(RealFunc *f) { fluxFld = f; }
+
   //! \brief Returns the scaling factor at given location.
   double getScaling(const Vec3& X, double dt = 0.0) const;
 
@@ -309,6 +312,15 @@ public:
   //! \param[in] X Cartesian coordinates of current integration point
   virtual bool evalInt(LocalIntegral& elmInt, const FiniteElement& fe,
                        const TimeDomain& time, const Vec3& X) const;
+
+  //! \brief Evaluates the integrand at a boundary point.
+  //! \param elmInt The local interal object to receive the contributions
+  //! \param[in] fe Finite element data of current integration point
+  //! \param[in] X Cartesian coordinates of current integration point
+  //! \param[in] normal Boundary normal vector at current integration point
+  virtual bool evalBou(LocalIntegral& elmInt, const FiniteElement& fe,
+                       const TimeDomain&, const Vec3& X,
+                       const Vec3& normal) const;
 
   //! \brief Evaluates the integrand at a boundary point.
   //! \param elmInt The local interal object to receive the contributions
@@ -388,6 +400,9 @@ private:
   void evalDynCouplingMatrix(Matrix& mx, const Vector& Nu, const Matrix& dNpdx,
                              const SymmTensor& K, double scl) const;
 
+  //! \brief Computes the boundary flux term for a quadrature point.
+  void evalBoundaryFlux(Matrix& mx, const Vector& Np, double scl) const;
+
 protected:
   //! \brief Computes the elasticity matrices for a quadrature point.
   //! \param elmInt The element matrix object to receive the contributions
@@ -415,6 +430,7 @@ private:
   bool useDynCoupling;  //!< If \e true, include the dynamic coupling matrix
 
   RealFunc *volumeFlux; //!< Applied volumetric flux
+  RealFunc *fluxFld;    //!< Boundary flux field
 
   friend class PoroNorm;
 };

@@ -25,7 +25,7 @@
 
 
 PoroElasticity::PoroElasticity (unsigned short int n)
-  : Elasticity(n), volumeFlux(nullptr)
+  : Elasticity(n), volumeFlux(nullptr), fluxFld(nullptr)
 {
   sc = 0.0;
   gravity[n-1] = 9.81; // Default gravity acceleration
@@ -360,13 +360,35 @@ bool PoroElasticity::evalInt (LocalIntegral& elmInt,
 }
 
 
+bool PoroElasticity::evalBou (LocalIntegral& elmInt,
+                              const FiniteElement& fe,
+                              const TimeDomain&, const Vec3& X,
+                              const Vec3& normal) const
+{
+  if (fluxFld) {
+    ElmMats& elMat = static_cast<ElmMats&>(elmInt);
+    elMat.b[Fp] -= (*fluxFld)(X) * fe.detJxW * fe.basis(1);
+    return true;
+  }
+
+  // Using the inherited standard method from Elasticity for tractions
+  return this->Elasticity::evalBou(elmInt, fe, X, normal);
+}
+
+
 bool PoroElasticity::evalBouMx (LocalIntegral& elmInt,
                                 const MxFiniteElement& fe,
                                 const TimeDomain&, const Vec3& X,
                                 const Vec3& normal) const
 {
-  // Using the inherited standard method from Elasticity
-  return this->evalBou(elmInt, fe, X, normal);
+  if (fluxFld) {
+    ElmMats& elMat = static_cast<ElmMats&>(elmInt);
+    elMat.b[Fp] -= (*fluxFld)(X) * fe.detJxW * fe.basis(2);
+    return true;
+  }
+
+  // Using the inherited standard method from Elasticity for tractions
+  return this->Elasticity::evalBou(elmInt, fe, X, normal);
 }
 
 
