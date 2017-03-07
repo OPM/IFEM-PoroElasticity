@@ -1,5 +1,10 @@
 SoilColumn3D-nonmixed.xinp
 
+	Length in X = 0.001
+	Length in Y = 0.008
+	Length in Z = 0.001
+PoroElasticity: scaling = 0 useDynCoupling = false
+Elasticity: 3D, gravity = 0 0 9.81
 	Constitutive Properties:
 		Young's Modulus, E = 6e+09
 		Poisson's Ratio, nu = 0.4
@@ -7,12 +12,11 @@ SoilColumn3D-nonmixed.xinp
 		Density of Fluid, rhof = 1000
 		Density of Solid, rhos = 2700
 	Bulk Moduli:
-		Bulk Modulus of Water, Kw = 3e+99
+		Bulk Modulus of Fluid, Kf = 3e+99
 		Bulk Modulus of Solid, Ks = 3e+99
 		Bulk Modulus of Medium, Ko = 0
 	Porosity, n = 0.5
-Gravity vector:
-	g = 0 0 0
+	Permeability, K = 0 0 0
 Number of elements    216
 Number of nodes       343
 Number of dofs        1372
@@ -22,6 +26,6 @@ Number of unknowns    888
                             Max Y-displacement : 0.00038676
                             Max pressure       : 0.000350497
   step = 2  time = 2400.2
-  Primary solution summary: L2-norm            : 0.000161672
-                            Max Y-displacement : 0.000517391
-                            Max pressure       : 0.000166102
+  Primary solution summary: L2-norm            : 0.000161666
+                            Max Y-displacement : 0.00051738
+                            Max pressure       : 0.000166088
