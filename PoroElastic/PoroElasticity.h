@@ -294,6 +294,7 @@ public:
   virtual bool initElementBou(const std::vector<int>&,
                               LocalIntegral&) { return true; }
 
+  using Elasticity::evalIntMx;
   //! \brief Evaluates the integrand at an interior point
   //! \param elmInt The local integral object to receive the contributions
   //! \param[in] fe Finite element data of current integration point
@@ -302,6 +303,7 @@ public:
   virtual bool evalIntMx(LocalIntegral& elmInt, const MxFiniteElement& fe,
                          const TimeDomain& time, const Vec3& X) const;
 
+  using Elasticity::evalInt;
   //! \brief Evaluates the integrand at an interior point
   //! \param elmInt The local integral object to receive the contributions
   //! \param[in] fe Finite element data of current integration point
@@ -310,6 +312,7 @@ public:
   virtual bool evalInt(LocalIntegral& elmInt, const FiniteElement& fe,
                        const TimeDomain& time, const Vec3& X) const;
 
+  using Elasticity::evalBouMx;
   //! \brief Evaluates the integrand at a boundary point.
   //! \param elmInt The local interal object to receive the contributions
   //! \param[in] fe Finite element data of current integration point
@@ -338,6 +341,7 @@ public:
                        const std::vector<size_t>& elem_sizes,
                        const std::vector<size_t>&) const;
 
+  using Elasticity::finalizeElement;
   //! \brief Finalizes the element quantities after the numerical integration.
   virtual bool finalizeElement(LocalIntegral&, const TimeDomain&, size_t);
 
@@ -450,6 +454,7 @@ public:
   //! \param[in] prefix Common prefix for all norm names
   virtual std::string getName(size_t i, size_t j, const char* prefix) const;
 
+  using NormBase::evalIntMx;
   //! \brief Evaluates the integrand at an interior point (mixed).
   //! \param elmInt The local integral object to receive the contributions
   //! \param[in] fe Finite element data of current integration point
@@ -458,6 +463,7 @@ public:
   virtual bool evalIntMx(LocalIntegral& elmInt, const MxFiniteElement& fe,
                          const TimeDomain& time, const Vec3& X) const;
 
+  using NormBase::evalInt;
   //! \brief Evaluates the integrand at an interior point.
   //! \param elmInt The local integral object to receive the contributions
   //! \param[in] fe Finite element data of current integration point
