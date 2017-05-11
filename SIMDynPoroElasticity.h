@@ -92,8 +92,9 @@ public:
       ar(dSim.getSolution(i));
     data.insert(std::make_pair(this->getName(), str.str()));
     return true;
-#endif
+#else
     return false;
+#endif
   }
 
   //! \brief Set internal state from a serialized state.
