@@ -547,7 +547,7 @@ std::string PoroNorm::getName(size_t i, size_t j, const char* prefix) const
 
   static std::string name;
   name = prefix + std::string(" ") + s[j-1];
-  return name.c_str();
+  return name;
 }
 
 

@@ -235,7 +235,7 @@ private:
 public:
   //! \brief Default constructor.
   //! \param[in] n Number of spatial dimensions
-  PoroElasticity(unsigned short int n = 3);
+  explicit PoroElasticity(unsigned short int n = 3);
   //! \brief Empty destructor.
   virtual ~PoroElasticity() {}
 

@@ -30,7 +30,7 @@ public:
   SIMDynPoroElasticity() : dSim(*this) {}
 
   //! \brief Constructor for mixed problems.
-  SIMDynPoroElasticity(const std::vector<unsigned char>& flds)
+  explicit SIMDynPoroElasticity(const std::vector<unsigned char>& flds)
     : SIMPoroElasticity<Dim>(flds), dSim(*this) {}
 
   //! \brief Empty destructor.
