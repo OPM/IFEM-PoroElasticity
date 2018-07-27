@@ -1,0 +1,98 @@
+SoilColumn3D-nonmixed.xinp
+
+/                        Group
+/0                       Group
+/0/PoroElasticity-1      Group
+/0/PoroElasticity-1/basis Group
+/0/PoroElasticity-1/basis/1 Dataset {14587}
+/0/PoroElasticity-1/fields Group
+/0/PoroElasticity-1/fields/Displacement_x&&Displacement_y&&Displacement_z&&Pressure Group
+/0/PoroElasticity-1/fields/Displacement_x&&Displacement_y&&Displacement_z&&Pressure/1 Dataset {1372}
+/0/PoroElasticity-1/fields/eps_x Group
+/0/PoroElasticity-1/fields/eps_x/1 Dataset {343}
+/0/PoroElasticity-1/fields/eps_xy Group
+/0/PoroElasticity-1/fields/eps_xy/1 Dataset {343}
+/0/PoroElasticity-1/fields/eps_xz Group
+/0/PoroElasticity-1/fields/eps_xz/1 Dataset {343}
+/0/PoroElasticity-1/fields/eps_y Group
+/0/PoroElasticity-1/fields/eps_y/1 Dataset {343}
+/0/PoroElasticity-1/fields/eps_yz Group
+/0/PoroElasticity-1/fields/eps_yz/1 Dataset {343}
+/0/PoroElasticity-1/fields/eps_z Group
+/0/PoroElasticity-1/fields/eps_z/1 Dataset {343}
+/0/PoroElasticity-1/fields/sig_x Group
+/0/PoroElasticity-1/fields/sig_x/1 Dataset {343}
+/0/PoroElasticity-1/fields/sig_xy Group
+/0/PoroElasticity-1/fields/sig_xy/1 Dataset {343}
+/0/PoroElasticity-1/fields/sig_xz Group
+/0/PoroElasticity-1/fields/sig_xz/1 Dataset {343}
+/0/PoroElasticity-1/fields/sig_y Group
+/0/PoroElasticity-1/fields/sig_y/1 Dataset {343}
+/0/PoroElasticity-1/fields/sig_yz Group
+/0/PoroElasticity-1/fields/sig_yz/1 Dataset {343}
+/0/PoroElasticity-1/fields/sig_z Group
+/0/PoroElasticity-1/fields/sig_z/1 Dataset {343}
+/0/timeinfo              Group
+/0/timeinfo/level        Dataset {1}
+/1                       Group
+/1/PoroElasticity-1      Group
+/1/PoroElasticity-1/fields Group
+/1/PoroElasticity-1/fields/Displacement_x&&Displacement_y&&Displacement_z&&Pressure Group
+/1/PoroElasticity-1/fields/Displacement_x&&Displacement_y&&Displacement_z&&Pressure/1 Dataset {1372}
+/1/PoroElasticity-1/fields/eps_x Group
+/1/PoroElasticity-1/fields/eps_x/1 Dataset {343}
+/1/PoroElasticity-1/fields/eps_xy Group
+/1/PoroElasticity-1/fields/eps_xy/1 Dataset {343}
+/1/PoroElasticity-1/fields/eps_xz Group
+/1/PoroElasticity-1/fields/eps_xz/1 Dataset {343}
+/1/PoroElasticity-1/fields/eps_y Group
+/1/PoroElasticity-1/fields/eps_y/1 Dataset {343}
+/1/PoroElasticity-1/fields/eps_yz Group
+/1/PoroElasticity-1/fields/eps_yz/1 Dataset {343}
+/1/PoroElasticity-1/fields/eps_z Group
+/1/PoroElasticity-1/fields/eps_z/1 Dataset {343}
+/1/PoroElasticity-1/fields/sig_x Group
+/1/PoroElasticity-1/fields/sig_x/1 Dataset {343}
+/1/PoroElasticity-1/fields/sig_xy Group
+/1/PoroElasticity-1/fields/sig_xy/1 Dataset {343}
+/1/PoroElasticity-1/fields/sig_xz Group
+/1/PoroElasticity-1/fields/sig_xz/1 Dataset {343}
+/1/PoroElasticity-1/fields/sig_y Group
+/1/PoroElasticity-1/fields/sig_y/1 Dataset {343}
+/1/PoroElasticity-1/fields/sig_yz Group
+/1/PoroElasticity-1/fields/sig_yz/1 Dataset {343}
+/1/PoroElasticity-1/fields/sig_z Group
+/1/PoroElasticity-1/fields/sig_z/1 Dataset {343}
+/1/timeinfo              Group
+/1/timeinfo/level        Dataset {1}
+/2                       Group
+/2/PoroElasticity-1      Group
+/2/PoroElasticity-1/fields Group
+/2/PoroElasticity-1/fields/Displacement_x&&Displacement_y&&Displacement_z&&Pressure Group
+/2/PoroElasticity-1/fields/Displacement_x&&Displacement_y&&Displacement_z&&Pressure/1 Dataset {1372}
+/2/PoroElasticity-1/fields/eps_x Group
+/2/PoroElasticity-1/fields/eps_x/1 Dataset {343}
+/2/PoroElasticity-1/fields/eps_xy Group
+/2/PoroElasticity-1/fields/eps_xy/1 Dataset {343}
+/2/PoroElasticity-1/fields/eps_xz Group
+/2/PoroElasticity-1/fields/eps_xz/1 Dataset {343}
+/2/PoroElasticity-1/fields/eps_y Group
+/2/PoroElasticity-1/fields/eps_y/1 Dataset {343}
+/2/PoroElasticity-1/fields/eps_yz Group
+/2/PoroElasticity-1/fields/eps_yz/1 Dataset {343}
+/2/PoroElasticity-1/fields/eps_z Group
+/2/PoroElasticity-1/fields/eps_z/1 Dataset {343}
+/2/PoroElasticity-1/fields/sig_x Group
+/2/PoroElasticity-1/fields/sig_x/1 Dataset {343}
+/2/PoroElasticity-1/fields/sig_xy Group
+/2/PoroElasticity-1/fields/sig_xy/1 Dataset {343}
+/2/PoroElasticity-1/fields/sig_xz Group
+/2/PoroElasticity-1/fields/sig_xz/1 Dataset {343}
+/2/PoroElasticity-1/fields/sig_y Group
+/2/PoroElasticity-1/fields/sig_y/1 Dataset {343}
+/2/PoroElasticity-1/fields/sig_yz Group
+/2/PoroElasticity-1/fields/sig_yz/1 Dataset {343}
+/2/PoroElasticity-1/fields/sig_z Group
+/2/PoroElasticity-1/fields/sig_z/1 Dataset {343}
+/2/timeinfo              Group
+/2/timeinfo/level        Dataset {1}
