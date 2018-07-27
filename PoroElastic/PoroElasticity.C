@@ -440,9 +440,12 @@ size_t PoroElasticity::getNoFields (int fld) const
 
 std::string PoroElasticity::getField1Name (size_t i, const char* prefix) const
 {
-  if (i == 11)
-    return "Displacements";
-  else if (i == 12)
+  if (i == 11 && npv != nsd+1)
+    return "Displacement";
+  else if (i == 11 && npv == nsd+1)
+    return nsd == 2 ? "Displacement_x&&Displacement_y&&Pressure" :
+                      "Displacement_x&&Displacement_y&&Displacement_z&&Pressure";
+  if (i == 12)
     return "Pressure";
   else if (i >= nsd)
     i = 3;
