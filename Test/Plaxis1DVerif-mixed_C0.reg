@@ -1,4 +1,4 @@
-Plaxis1DVerif.xinp -2D -mixed full
+Plaxis1DVerif.xinp -2D -mixed
 
 	Topology sets: Bottom (1,3,1D)
 	               Top (1,4,1D)
@@ -13,18 +13,19 @@ Elasticity: 2D, gravity = 0 9.81
 	Poisson's Ratio, nu = 0
 	Porosity, n = 0.5
 Number of elements    81
-Number of nodes       265
-Number of dofs        409
-Number of D-dofs      288
+Number of nodes       521
+Number of dofs        921
+Number of D-dofs      800
 Number of P-dofs      121
-Number of unknowns    352
+Number of unknowns    832
   step=1  time=8475.82
-  Primary solution summary: L2-norm            : 0.0248471
+  Primary solution summary: L2-norm            : 0.0204749
                    Pressure L2-norm            : 0.0894779
                             Max Y-displacement : 0.10011
                             Max pressure       : 0.099991
+
   step=2  time=16951.6
-  Primary solution summary: L2-norm            : 0.0406314
+  Primary solution summary: L2-norm            : 0.0343464
                    Pressure L2-norm            : 0.0859184
                             Max Y-displacement : 0.149947
                             Max pressure       : 0.0999457

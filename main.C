@@ -134,8 +134,12 @@ int main (int argc, char** argv)
       ; // ignore the obsolete option
     else if (!strcmp(argv[i],"-2D"))
       twoD = Elastic::planeStrain = true;
-    else if (!strcmp(argv[i],"-mixed"))
-      ASMmxBase::Type = ASMmxBase::FULL_CONT_RAISE_BASIS1;
+    else if (!strcmp(argv[i],"-mixed")) {
+      ASMmxBase::Type = ASMmxBase::REDUCED_CONT_RAISE_BASIS1;
+      if (i < argc-1 && argv[i+1][0] != '-')
+        if (strcmp(argv[++i],"full") == 0)
+          ASMmxBase::Type = ASMmxBase::FULL_CONT_RAISE_BASIS1;
+    }
     else if (!strcmp(argv[i],"-dyn2"))
       integrator = 2;
     else if (!strncmp(argv[i],"-dyn",4))

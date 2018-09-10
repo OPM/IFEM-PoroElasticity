@@ -58,6 +58,7 @@ if(MPI_FOUND)
   # Add parallel tests here
 else()
   ifem_add_test(Plaxis1DVerif.reg PoroElasticity)
+  ifem_add_test(Plaxis1DVerif-mixed_C0.reg PoroElasticity)
   ifem_add_test(Plaxis1DVerif-nonmixed.reg PoroElasticity)
   ifem_add_test(OGSBenchmark1D.reg PoroElasticity)
   ifem_add_test(OGSBenchmark1D-nonmixed.reg PoroElasticity)
