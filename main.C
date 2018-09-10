@@ -14,6 +14,7 @@
 #include "IFEM.h"
 #include "SIM2D.h"
 #include "SIM3D.h"
+#include "SIMStatPoroElasticity.h"
 #include "SIMDynPoroElasticity.h"
 #include "SIMSolver.h"
 #include "GenAlphaSIM.h"
@@ -21,11 +22,28 @@
 
 
 /*!
-  \brief Creates the poroelastic simulator and launches the simulation.
-  \param[in] infile The input file to parse
+  \brief Dynamic simulation driver.
 */
 
-template<class Dim, class Sim> int runSimulator (char* infile)
+template<class T> class SIMDriver : public SIMSolver<T>
+{
+public:
+  //! \brief The constructor forwards to the parent class constructor.
+  SIMDriver(T& s) : SIMSolver<T>(s) {}
+  //! \brief Empty destructor.
+  virtual ~SIMDriver() {}
+  //! \brief Overrides the stop time that was read from the input file.
+  void setStopTime(double t) { SIMSolver<T>::tp.stopTime = t; }
+};
+
+
+/*!
+  \brief Creates the poroelastic simulator and launches the simulation.
+  \param[in] infile The input file to parse
+  \param[in] stopTime Stop time of the simulation (if non-negative)
+*/
+
+template<class Dim, class Sim> int runSimulator (char* infile, double stopTime)
 {
   utl::profiler->start("Model input");
   IFEM::cout <<"\n\n0. Parsing input file(s)."
@@ -39,11 +57,15 @@ template<class Dim, class Sim> int runSimulator (char* infile)
   model.opt.print(IFEM::cout) << std::endl;
 
   // Establish the simulation driver
-  SIMSolver<Sim> solver(model);
+  SIMDriver<Sim> solver(model);
   if (!solver.read(infile))
     return 1;
 
   utl::profiler->stop("Model input");
+
+  if (stopTime >= 0.0)
+    solver.setStopTime(stopTime);
+
   IFEM::cout <<"\n\n10. Preprocessing the finite element model:"
              <<"\n==========================================="<< std::endl;
 
@@ -76,16 +98,17 @@ template<class Dim, class Sim> int runSimulator (char* infile)
   \param[in] infile The input file to parse
   \param[in] integrator The time integrator to use (0=linear quasi-static,
              1=linear Newmark, 2=Generalized alpha)
+  \param[in] T1 Stop time of the simulation (if non-negative)
 */
 
-template<class Dim> int runSimulator (char* infile, char integrator)
+template<class Dim> int runSimulator (char* infile, char integrator, double T1)
 {
   if (integrator == 2)
-    return runSimulator<Dim, SIMDynPoroElasticity<Dim,GenAlphaSIM> >(infile);
+    return runSimulator<Dim, SIMDynPoroElasticity<Dim,GenAlphaSIM> >(infile,T1);
   else if (integrator > 0)
-    return runSimulator<Dim, SIMDynPoroElasticity<Dim,NewmarkSIM> >(infile);
+    return runSimulator<Dim, SIMDynPoroElasticity<Dim,NewmarkSIM> >(infile,T1);
   else // quasi-static
-    return runSimulator<Dim, SIMPoroElasticity<Dim> >(infile);
+    return runSimulator<Dim, SIMStatPoroElasticity<Dim> >(infile,T1);
 }
 
 
@@ -101,6 +124,7 @@ int main (int argc, char** argv)
   char* infile = nullptr;
   char integrator = 0;
   bool twoD = false;
+  double stopTime = -1.0;
   ASMmxBase::Type = ASMmxBase::NONE;
 
   IFEM::Init(argc,argv,"Poroelasticity solver");
@@ -116,6 +140,8 @@ int main (int argc, char** argv)
       integrator = 2;
     else if (!strncmp(argv[i],"-dyn",4))
       integrator = 1;
+    else if (!strncmp(argv[i],"-stopT",6) && i < argc-1)
+      stopTime = atof(argv[++i]);
     else if (!infile)
       infile = argv[i];
     else
@@ -127,15 +153,18 @@ int main (int argc, char** argv)
               <<" <inputfile> [-dense|-spr|-superlu[<nt>]|-samg|-petsc]\n      "
               <<" [-lag|-spec|-LR] [-2D] [-nGauss <n>] [-mixed] [-dyn[1|2]]\n"
               <<"       [-vtf <format> [-nviz <nviz>] [-nu <nu> [-nv <nv>]"
-              <<" [-nw <nw>]] [-hdf5]\n";
+              <<" [-nw <nw>]] [-hdf5] [-stopTime <t>]\n";
     return 0;
   }
 
   IFEM::cout <<"\nInput file: "<< infile;
-  IFEM::getOptions().print(IFEM::cout) << std::endl;
+  IFEM::getOptions().print(IFEM::cout);
+  if (stopTime >= 0.0)
+    IFEM::cout <<"\nSimulation stop time: "<< stopTime;
+  IFEM::cout << std::endl;
 
   if (twoD)
-    return runSimulator<SIM2D>(infile,integrator);
+    return runSimulator<SIM2D>(infile,integrator,stopTime);
   else
-    return runSimulator<SIM3D>(infile,integrator);
+    return runSimulator<SIM3D>(infile,integrator,stopTime);
 }

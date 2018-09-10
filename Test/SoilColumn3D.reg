@@ -23,12 +23,12 @@ Number of dofs        1879
 Number of D-dofs      1536
 Number of P-dofs      343
 Number of unknowns    1246
-  step = 1  time = 1200.2
+  step=1  time=1200.2
   Primary solution summary: L2-norm            : 0.000125749
                    Pressure L2-norm            : 0.000259295
                             Max Y-displacement : 0.000387386
                             Max pressure       : 0.000349614
-  step = 2  time = 2400.4
+  step=2  time=2400.4
   Primary solution summary: L2-norm            : 0.000176973
                    Pressure L2-norm            : 0.00011852
                             Max Y-displacement : 0.000517315

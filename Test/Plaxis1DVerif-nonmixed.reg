@@ -15,11 +15,11 @@ Number of elements    81
 Number of nodes       121
 Number of dofs        363
 Number of unknowns    310
-  step = 1  time = 8475.82
+  step=1  time=8475.82
   Primary solution summary: L2-norm            : 0.0552476
                             Max Y-displacement : 0.1
                             Max pressure       : 0.0999912
-  step = 2  time = 16951.6
+  step=2  time=16951.6
   Primary solution summary: L2-norm            : 0.0589531
                             Max Y-displacement : 0.15
                             Max pressure       : 0.0999451

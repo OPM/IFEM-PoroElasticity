@@ -49,10 +49,6 @@ public:
   //! \brief Computes the solution for the current time step.
   virtual bool solveStep(TimeStep& tp)
   {
-    if (Dim::msgLevel >= 0)
-      IFEM::cout <<"\n  step = "<< tp.step
-                 <<"  time = "<< tp.time.t << std::endl;
-
     this->setMode(SIM::STATIC);
     this->setQuadratureRule(Dim::opt.nGauss[0],true);
     if (!this->assembleSystem(tp.time,SIMsolution::solution))
