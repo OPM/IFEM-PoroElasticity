@@ -164,6 +164,20 @@ public:
     return this->SIMElasticityWrap<Dim>::initNeumann(propInd);
   }
 
+  //! \brief Initializes the linear equation solver and solution vectors.
+  //! \param[in] tp Time stepping parameters
+  //! \param[in] withRF If \e true, reaction forces will be calculated
+  virtual bool init(const TimeStep& tp, bool withRF = false)
+  {
+    bool retval = this->SIMElasticityWrap<Dim>::init(tp, withRF);
+
+    // Ensure we have enough solution vectors
+    if (this->SIMsolution::solution.size() < 2)
+      retval &= this->initSolution(this->getNoDOFs(), 2);
+
+    return retval;
+  }
+
 protected:
   //! \brief Returns the actual integrand.
   virtual Elasticity* getIntegrand()

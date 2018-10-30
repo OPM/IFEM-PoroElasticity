@@ -1,4 +1,4 @@
-Plaxis1DVerif-nonmixed.xinp -2D
+Plaxis1DVerif-nonmixed.xinp -2D -halfstatic
 
 Input file: Plaxis1DVerif-nonmixed.xinp
 Equation solver: 2

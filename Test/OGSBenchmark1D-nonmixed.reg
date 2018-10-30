@@ -1,4 +1,4 @@
-OGSBenchmark1D-nonmixed.xinp -2D
+OGSBenchmark1D-nonmixed.xinp -2D -halfstatic
 
 Input file: OGSBenchmark1D-nonmixed.xinp
 Equation solver: 2

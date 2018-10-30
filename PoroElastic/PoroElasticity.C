@@ -25,7 +25,8 @@
 #include "tinyxml.h"
 
 
-PoroElasticity::PoroElasticity (unsigned short int n, bool mix) : Elasticity(n)
+PoroElasticity::PoroElasticity (unsigned short int n, bool mix, bool staticFlow) :
+  Elasticity(n), staticFlow(staticFlow)
 {
   gravity[n-1] = 9.81; // Default gravity acceleration
   npv = mix ? 0 : nsd+1; // Number of primary unknowns per node (non-mixed only)
@@ -92,7 +93,17 @@ void PoroElasticity::printLog () const
 
 void PoroElasticity::setMode (SIM::SolutionMode mode)
 {
+  // In the half-static case we need access to the previous timestep,
+  // while in the nonlinear case we need access to the previous iteration.
+  // To keep things simple we ask for two solution vectors in all static modes.
+  if (mode == SIM::STATIC)
+    nSV = 2;
+  else if (mode == SIM::DYNAMIC)
+    nSV = 1;
+
+  // The parent method resizes primsol
   this->Elasticity::setMode(mode);
+
   eS = Fu + 1; // Elasticity::evalBou stores traction force vectors here
   iS = mode == SIM::DYNAMIC ? 1 : 0; // Flag calculation of internal forces
 }
@@ -131,7 +142,7 @@ LocalIntegral* PoroElasticity::getLocalIntegral (const std::vector<size_t>& nen,
                                          intPrm[2], intPrm[3],
                                          intPrm[0], intPrm[1], useDynCoupling, nsd);
   else
-    return new MixedElmMats(nen[0], nen[1], neumann, 0, nsd);
+    return new MixedElmMats(nen[0], nen[1], neumann, staticFlow ? 0 : 1, nsd);
 }
 
 
@@ -143,7 +154,7 @@ LocalIntegral* PoroElasticity::getLocalIntegral (size_t nen,
                                        intPrm[2], intPrm[3],
                                        intPrm[0], intPrm[1], useDynCoupling, nsd);
   else
-    return new StdElmMats(nen, nen, neumann, 0, nsd);
+    return new StdElmMats(nen, nen, neumann, staticFlow ? 0 : 1, nsd);
 }
 
 
@@ -153,6 +164,8 @@ bool PoroElasticity::initElement (const std::vector<int>& MNPC,
                                   LocalIntegral& elmInt)
 {
   if (primsol.empty() || primsol.front().empty())
+    return true;
+  if (m_mode == SIM::STATIC && (primsol.size() < 2 || primsol[1].empty()))
     return true;
 
   // Split the nodal correspondance array into one for each solution field
@@ -165,8 +178,9 @@ bool PoroElasticity::initElement (const std::vector<int>& MNPC,
     elmInt.vec.resize(nsol);
 
   // Extract the element level solution vectors
-  int ierr = utl::gather(MNPCu, nsd, primsol.front(), elmInt.vec[Vu]);
-  ierr += utl::gather(MNPCp, 0, 1, primsol.front(), elmInt.vec[Vp],
+  Vector& sol = (m_mode == SIM::STATIC) ? primsol[1] : primsol.front();
+  int ierr = utl::gather(MNPCu, nsd, sol, elmInt.vec[Vu]);
+  ierr += utl::gather(MNPCp, 0, 1, sol, elmInt.vec[Vp],
                       nsd*basis_sizes.front(), basis_sizes.front());
 
   if (m_mode == SIM::DYNAMIC)
@@ -193,6 +207,8 @@ bool PoroElasticity::initElement (const std::vector<int>& MNPC,
 {
   if (primsol.empty() || primsol.front().empty())
     return true;
+  if (m_mode == SIM::STATIC && (primsol.size() < 2 || primsol[1].empty()))
+    return true;
 
   size_t nsol = m_mode == SIM::DYNAMIC ? NSOL : 2;
   if (elmInt.vec.size() < nsol)
@@ -201,7 +217,8 @@ bool PoroElasticity::initElement (const std::vector<int>& MNPC,
   Matrix temp(npv, MNPC.size());
 
   // Extract the element level solution vectors
-  int ierr = utl::gather(MNPC, npv, primsol.front(), temp);
+  Vector& sol = (m_mode == SIM::STATIC) ? primsol[1] : primsol.front();
+  int ierr = utl::gather(MNPC, npv, sol, temp);
   elmInt.vec[Vp] = temp.getRow(npv);
   elmInt.vec[Vu] = temp.expandRows(-1);
 
@@ -372,9 +389,11 @@ bool PoroElasticity::evalInt (LocalIntegral& elmInt,
                                 scl*alpha*fe.detJxW))
     return false;
 
-  if (!this->evalCompressibilityMatrix(elMat.A[pp_S], fe.basis(2),
-                                       scl*scl*Minv*fe.detJxW))
-    return false;
+  // In the fully static formulation, we don't need the S-matrix
+  if (m_mode == SIM::DYNAMIC || !staticFlow)
+    if (!this->evalCompressibilityMatrix(elMat.A[pp_S], fe.basis(2),
+                                         scl*scl*Minv*fe.detJxW))
+        return false;
 
   if (volumeFlux)
     elMat.b[Fp].add(fe.basis(2),(*volumeFlux)(X)*fe.detJxW);
