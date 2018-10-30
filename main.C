@@ -22,6 +22,17 @@
 
 
 /*!
+  \brief Enumerates the different integration options.
+*/
+enum Integrator {
+  FULL_STATIC,                  //!< Quasistatic in both displacements and flow (aka fully static)
+  HALF_STATIC,                  //!< Quasistatic in displacements, dynamic in flow (aka half static)
+  NEWMARK,                      //!< Dynamic, Newmark timestepping
+  GENALPHA                      //!< Dynamic, Generalized alpha timestepping
+};
+
+
+/*!
   \brief Dynamic simulation driver.
 */
 
@@ -96,19 +107,19 @@ template<class Dim, class Sim> int runSimulator (char* infile, double stopTime)
 /*!
   \brief Creates the dynamic poroelastic simulator and launches the simulation.
   \param[in] infile The input file to parse
-  \param[in] integrator The time integrator to use (0=linear quasi-static,
-             1=linear Newmark, 2=Generalized alpha)
+  \param[in] integrator The time integrator to use
   \param[in] T1 Stop time of the simulation (if non-negative)
 */
 
-template<class Dim> int runSimulator (char* infile, char integrator, double T1)
+template<class Dim> int runSimulator (char* infile, Integrator integrator, double T1)
 {
-  if (integrator == 2)
-    return runSimulator<Dim, SIMDynPoroElasticity<Dim,GenAlphaSIM> >(infile,T1);
-  else if (integrator > 0)
-    return runSimulator<Dim, SIMDynPoroElasticity<Dim,NewmarkSIM> >(infile,T1);
-  else // quasi-static
-    return runSimulator<Dim, SIMStatPoroElasticity<Dim> >(infile,T1);
+  switch (integrator) {
+  case FULL_STATIC: return runSimulator<Dim, SIMStatPoroElasticity<Dim, true>>(infile, T1);
+  case HALF_STATIC: return runSimulator<Dim, SIMStatPoroElasticity<Dim, false>>(infile, T1);
+  case NEWMARK: return runSimulator<Dim, SIMDynPoroElasticity<Dim, NewmarkSIM>>(infile, T1);
+  case GENALPHA: return runSimulator<Dim, SIMDynPoroElasticity<Dim, GenAlphaSIM>>(infile, T1);
+  default: return 1;
+  }
 }
 
 
@@ -122,7 +133,7 @@ int main (int argc, char** argv)
   utl::profiler->start("Initialization");
 
   char* infile = nullptr;
-  char integrator = 0;
+  Integrator integrator = FULL_STATIC;
   bool twoD = false;
   double stopTime = -1.0;
   ASMmxBase::Type = ASMmxBase::NONE;
@@ -139,9 +150,13 @@ int main (int argc, char** argv)
     else if (!strncmp(argv[i],"-mixed",6))
       ASMmxBase::Type = ASMmxBase::REDUCED_CONT_RAISE_BASIS1;
     else if (!strcmp(argv[i],"-dyn2"))
-      integrator = 2;
+      integrator = GENALPHA;
     else if (!strncmp(argv[i],"-dyn",4))
-      integrator = 1;
+      integrator = NEWMARK;
+    else if (!strcmp(argv[i],"-halfstatic"))
+      integrator = HALF_STATIC;
+    else if (!strcmp(argv[i],"-fullstatic"))
+      integrator = FULL_STATIC;
     else if (!strncmp(argv[i],"-stopT",6) && i < argc-1)
       stopTime = atof(argv[++i]);
     else if (!infile)
@@ -152,10 +167,11 @@ int main (int argc, char** argv)
   if (!infile)
   {
     std::cout <<"Usage: "<< argv[0]
-              <<" <inputfile> [-dense|-spr|-superlu[<nt>]|-samg|-petsc]\n      "
-              <<" [-lag|-spec|-LR] [-2D] [-nGauss <n>] [-mixed] [-dyn[1|2]]\n"
-              <<"       [-vtf <format> [-nviz <nviz>] [-nu <nu> [-nv <nv>]"
-              <<" [-nw <nw>]] [-hdf5] [-stopTime <t>]\n";
+              <<" <inputfile> [-dense|-spr|-superlu[<nt>]|-samg|-petsc]\n"
+              <<"       [-lag|-spec|-LR] [-2D] [-nGauss <n>] [-mixed]\n"
+              <<"       [-dyn[1|2]|-halfstatic|-fullstatic]\n"
+              <<"       [-vtf <format> [-nviz <nviz>] [-nu <nu> [-nv <nv>]\n"
+              <<"       [-nw <nw>]] [-hdf5] [-stopTime <t>]\n";
     return 0;
   }
 

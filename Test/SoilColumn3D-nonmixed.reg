@@ -1,4 +1,4 @@
-SoilColumn3D-nonmixed.xinp
+SoilColumn3D-nonmixed.xinp -halfstatic
 
 Input file: SoilColumn3D-nonmixed.xinp
 Equation solver: 2

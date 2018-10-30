@@ -25,7 +25,8 @@
 #include "tinyxml.h"
 
 
-PoroElasticity::PoroElasticity (unsigned short int n, bool mix) : Elasticity(n)
+PoroElasticity::PoroElasticity (unsigned short int n, bool mix, bool staticFlow) :
+  Elasticity(n), staticFlow(staticFlow)
 {
   gravity[n-1] = 9.81; // Default gravity acceleration
   npv = mix ? 0 : nsd+1; // Number of primary unknowns per node (non-mixed only)
@@ -131,7 +132,7 @@ LocalIntegral* PoroElasticity::getLocalIntegral (const std::vector<size_t>& nen,
                                          intPrm[2], intPrm[3],
                                          intPrm[0], intPrm[1], useDynCoupling, nsd);
   else
-    return new MixedElmMats(nen[0], nen[1], neumann, 0, nsd);
+    return new MixedElmMats(nen[0], nen[1], neumann, staticFlow ? 0 : 1, nsd);
 }
 
 
@@ -143,7 +144,7 @@ LocalIntegral* PoroElasticity::getLocalIntegral (size_t nen,
                                        intPrm[2], intPrm[3],
                                        intPrm[0], intPrm[1], useDynCoupling, nsd);
   else
-    return new StdElmMats(nen, nen, neumann, 0, nsd);
+    return new StdElmMats(nen, nen, neumann, staticFlow ? 0 : 1, nsd);
 }
 
 
@@ -372,9 +373,11 @@ bool PoroElasticity::evalInt (LocalIntegral& elmInt,
                                 scl*alpha*fe.detJxW))
     return false;
 
-  if (!this->evalCompressibilityMatrix(elMat.A[pp_S], fe.basis(2),
-                                       scl*scl*Minv*fe.detJxW))
-    return false;
+  // In the fully static formulation, we don't need the S-matrix
+  if (m_mode == SIM::DYNAMIC || !staticFlow)
+    if (!this->evalCompressibilityMatrix(elMat.A[pp_S], fe.basis(2),
+                                         scl*scl*Minv*fe.detJxW))
+        return false;
 
   if (volumeFlux)
     elMat.b[Fp].add(fe.basis(2),(*volumeFlux)(X)*fe.detJxW);

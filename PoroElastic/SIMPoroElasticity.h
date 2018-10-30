@@ -66,7 +66,7 @@ public:
   }
 
   //! \brief Evaluates some iteration norms for convergence assessment.
-  //! \param[in] x Global primary solution vector
+  //! \param[in] u Global primary solution vector
   //! \param[in] r Global residual vector associated with the solution vector
   //! \param[out] eNorm Energy norm of solution increment
   //! \param[out] rNorm Residual norm of solution increment
@@ -169,7 +169,7 @@ protected:
   virtual Elasticity* getIntegrand()
   {
     if (!Dim::myProblem)
-      Dim::myProblem = new PoroElasticity(Dim::dimension, Dim::nf.size() > 1);
+      Dim::myProblem = new PoroElasticity(Dim::dimension, Dim::nf.size() > 1, true);
     return static_cast<Elasticity*>(Dim::myProblem);
   }
 

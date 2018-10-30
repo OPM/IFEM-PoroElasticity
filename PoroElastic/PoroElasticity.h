@@ -78,7 +78,7 @@ protected:
     //! \param[in] ndof_press Number of dofs in pressure
     //! \param[in] neumann Whether or not we are assembling Neumann BCs
     //! \param[in] dynamic Option for dynamic analysis
-    //! (0: static analysis, 1: allocate M, 2: allocate M and D)
+    //! (0: fully static, 1: half static, 2: allocate M, 3: allocate M and D)
     //! \param[in] nbasis Number of different bases
     //! \param[in] nsd Number of space dimensions
     Mats(size_t ndof_displ, size_t ndof_press, bool neumann, char dynamic,
@@ -99,6 +99,7 @@ protected:
   protected:
     double h;      //!< Current time step size
     double lambda; //!< Perpendicular crack stretch at current location
+    char dynamic;  //!< Current dynamic mode (see constructor)
   };
 
 private:
@@ -132,7 +133,7 @@ private:
     NewmarkMats(size_t ndof_d, size_t ndof_p, bool neumann,
                 double b, double c, double m, double s,
                 bool useDynCpl, int nsd)
-      : P(ndof_d, ndof_p, neumann, useDynCpl ? 2 : 1, nsd),
+      : P(ndof_d, ndof_p, neumann, useDynCpl ? 3 : 2, nsd),
         beta(fabs(b)), gamma(c), m_damp(m), s_damp(s), slvDisp(b < 0.0) {}
     //! \brief Empty destructor.
     virtual ~NewmarkMats() {}
@@ -221,7 +222,10 @@ public:
   //! \brief Default constructor.
   //! \param[in] n Number of spatial dimensions
   //! \param[in] mix If \e true, a mixed formulation is used
-  explicit PoroElasticity(unsigned short int n = 3, bool mix = false);
+  //! \param[in] staticFlow If \e false, switches to a half-static formulation
+  //!            (no effect in dynamic mode)
+  PoroElasticity(unsigned short int n, bool mix, bool staticFlow);
+
   //! \brief The destructor deletes the volume flux function, if any.
   virtual ~PoroElasticity();
 
@@ -421,6 +425,7 @@ private:
 
   bool calculateEnergy; //!< If \e true, perform energy norm calculation
   bool useDynCoupling;  //!< If \e true, include the dynamic coupling matrix
+  bool staticFlow;      //!< If \e true, use a fully static formulation
 
   RealFunc* volumeFlux; //!< Applied volumetric flux
   RealFunc* fluxFld;    //!< Boundary flux field

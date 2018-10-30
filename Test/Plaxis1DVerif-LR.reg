@@ -1,4 +1,4 @@
-Plaxis1DVerif.xinp -2D -mixed-full -LR
+Plaxis1DVerif.xinp -2D -mixed-full -LR -halfstatic
 
 	Topology sets: Bottom (1,3,1D)
 	               Top (1,4,1D)
