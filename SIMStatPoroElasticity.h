@@ -21,7 +21,7 @@
   \brief Driver class for quasi-static poroelasticity problems.
 */
 
-template<class Dim> class SIMStatPoroElasticity : public SIMPoroElasticity<Dim>
+template<class Dim, bool staticFlow> class SIMStatPoroElasticity : public SIMPoroElasticity<Dim>
 {
 public:
   //! \brief Default constructor.
@@ -49,6 +49,15 @@ public:
     utl::zero_print_tol = oldtol;
 
     return ok;
+  }
+
+protected:
+  //! \brief Returns the actual integrand.
+  virtual Elasticity* getIntegrand()
+  {
+    if (!Dim::myProblem)
+      Dim::myProblem = new PoroElasticity(Dim::dimension, Dim::nf.size() > 1, staticFlow);
+    return static_cast<Elasticity*>(Dim::myProblem);
   }
 };
 

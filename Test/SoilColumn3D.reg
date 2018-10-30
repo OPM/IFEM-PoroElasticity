@@ -1,4 +1,4 @@
-SoilColumn3D.xinp -mixed-full
+SoilColumn3D.xinp -mixed-full -halfstatic
 
 	Length in X = 0.001
 	Length in Y = 0.008
