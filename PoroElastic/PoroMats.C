@@ -18,8 +18,8 @@
 
 
 PoroElasticity::Mats::Mats (size_t ndof_displ, size_t ndof_press,
-                            bool neumann, char dynamic, int nbasis, int nsd)
-  : BlockElmMats(2, nbasis), dynamic(dynamic)
+                            bool neumann, char dynamic, bool residual, int nbasis, int nsd)
+  : BlockElmMats(2, nbasis), dynamic(dynamic), residual(residual)
 {
   this->resize(NMAT, NVEC);
 
@@ -98,6 +98,14 @@ const Vector& PoroElasticity::Mats::getRHSVector () const
       A[up_Q].multiply(vec[Vu], fp, true, true);
     if (A.size() > pp_S && vec.size() > Vp)
       A[pp_S].multiply(vec[Vp], fp, false, true);
+  }
+
+  // Calculate residual if requested
+  // The stiffness-displacement term is already added somehow, so skip it here
+  // TODO: Make this work in half-static mode.
+  if (dynamic == 0 && residual) {
+    A[pp_P].multiply(vec[Vp], const_cast<Vector&>(b[Fp]), -1.0, 1.0);
+    A[up_Q].multiply(vec[Vp], const_cast<Vector&>(b[Fu]), +1.0, 1.0);
   }
 
   const Vector& result = this->BlockElmMats::getRHSVector();

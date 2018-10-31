@@ -79,10 +79,11 @@ protected:
     //! \param[in] neumann Whether or not we are assembling Neumann BCs
     //! \param[in] dynamic Option for dynamic analysis
     //! (0: fully static, 1: half static, 2: allocate M, 3: allocate M and D)
+    //! \param[in] residual True if residuals should be computed
     //! \param[in] nbasis Number of different bases
     //! \param[in] nsd Number of space dimensions
     Mats(size_t ndof_displ, size_t ndof_press, bool neumann, char dynamic,
-         int nbasis, int nsd);
+         bool residual, int nbasis, int nsd);
     //! \brief Empty destructor.
     virtual ~Mats() {}
 
@@ -100,6 +101,7 @@ protected:
     double h;      //!< Current time step size
     double lambda; //!< Perpendicular crack stretch at current location
     char dynamic;  //!< Current dynamic mode (see constructor)
+    bool residual; //!< Whether to calculate residuals on RHS
   };
 
 private:
@@ -108,8 +110,8 @@ private:
   {
   public:
     //! \brief The constructor forwards to the parent class constructor.
-    MixedElmMats(size_t ndof_d, size_t ndof_p, bool neumann, char dyn, int nsd)
-      : Mats(ndof_d, ndof_p, neumann, dyn, 2, nsd) {}
+    MixedElmMats(size_t ndof_d, size_t ndof_p, bool neumann, char dyn, bool residual, int nsd)
+      : Mats(ndof_d, ndof_p, neumann, dyn, residual, 2, nsd) {}
     //! \brief Empty destructor.
     virtual ~MixedElmMats() {}
   };
@@ -119,8 +121,8 @@ private:
   {
   public:
     //! \brief The constructor forwards to the parent class constructor.
-    StdElmMats(size_t ndof_d, size_t ndof_p, bool neumann, char dyn, int nsd)
-      : Mats(ndof_d, ndof_p, neumann, dyn, 1, nsd) {}
+    StdElmMats(size_t ndof_d, size_t ndof_p, bool neumann, char dyn, bool residual, int nsd)
+      : Mats(ndof_d, ndof_p, neumann, dyn, residual, 1, nsd) {}
     //! \brief Empty destructor.
     virtual ~StdElmMats() {}
   };
@@ -133,7 +135,7 @@ private:
     NewmarkMats(size_t ndof_d, size_t ndof_p, bool neumann,
                 double b, double c, double m, double s,
                 bool useDynCpl, int nsd)
-      : P(ndof_d, ndof_p, neumann, useDynCpl ? 3 : 2, nsd),
+      : P(ndof_d, ndof_p, neumann, useDynCpl ? 3 : 2, false, nsd),
         beta(fabs(b)), gamma(c), m_damp(m), s_damp(s), slvDisp(b < 0.0) {}
     //! \brief Empty destructor.
     virtual ~NewmarkMats() {}
@@ -420,8 +422,10 @@ protected:
                                       const FiniteElement& fe,
                                       const Vec3& X) const;
 
+  bool residual;        //!< If \e true, compute residuals
+
 private:
-  double scl; //!< Scaling factor
+  double scl;           //!< Scaling factor
 
   bool calculateEnergy; //!< If \e true, perform energy norm calculation
   bool useDynCoupling;  //!< If \e true, include the dynamic coupling matrix

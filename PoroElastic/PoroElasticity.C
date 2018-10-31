@@ -32,7 +32,7 @@ PoroElasticity::PoroElasticity (unsigned short int n, bool mix, bool staticFlow)
   npv = mix ? 0 : nsd+1; // Number of primary unknowns per node (non-mixed only)
 
   scl = 0.0;
-  calculateEnergy = useDynCoupling = false;
+  calculateEnergy = useDynCoupling = residual = false;
 
   volumeFlux = fluxFld = nullptr;
 }
@@ -132,7 +132,7 @@ LocalIntegral* PoroElasticity::getLocalIntegral (const std::vector<size_t>& nen,
                                          intPrm[2], intPrm[3],
                                          intPrm[0], intPrm[1], useDynCoupling, nsd);
   else
-    return new MixedElmMats(nen[0], nen[1], neumann, staticFlow ? 0 : 1, nsd);
+    return new MixedElmMats(nen[0], nen[1], neumann, staticFlow ? 0 : 1, residual, nsd);
 }
 
 
@@ -144,7 +144,7 @@ LocalIntegral* PoroElasticity::getLocalIntegral (size_t nen,
                                        intPrm[2], intPrm[3],
                                        intPrm[0], intPrm[1], useDynCoupling, nsd);
   else
-    return new StdElmMats(nen, nen, neumann, staticFlow ? 0 : 1, nsd);
+    return new StdElmMats(nen, nen, neumann, staticFlow ? 0 : 1, residual, nsd);
 }
 
 
