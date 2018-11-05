@@ -182,7 +182,7 @@ protected:
     {
       const TiXmlElement* child = elem->FirstChildElement();
       for (; child; child = child->NextSiblingElement())
-        if (!strcasecmp(child->Value(),"scaling"))
+        if (!strcasecmp(child->Value(),"normscaling"))
         {
           utl::getAttribute(child,"displacement",scaleD);
           utl::getAttribute(child,"pressure",scaleP);

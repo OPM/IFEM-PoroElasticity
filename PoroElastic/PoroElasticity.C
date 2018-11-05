@@ -31,7 +31,6 @@ PoroElasticity::PoroElasticity (unsigned short int n, bool mix, bool staticFlow)
   gravity[n-1] = 9.81; // Default gravity acceleration
   npv = mix ? 0 : nsd+1; // Number of primary unknowns per node (non-mixed only)
 
-  scl = 0.0;
   calculateEnergy = useDynCoupling = residual = false;
 
   volumeFlux = fluxFld = nullptr;
@@ -56,10 +55,8 @@ bool PoroElasticity::parse (const TiXmlElement* elem)
     utl::getAttribute(elem,"type",type);
     volumeFlux = utl::parseRealFunc(elem->GetText(),type);
   }
-  else if (strcasecmp(elem->Value(),"scaling"))
+  else
     return this->Elasticity::parse(elem);
-  else if (utl::getAttribute(elem,"value",scl))
-    IFEM::cout <<"\tScaling: sc = "<< scl << std::endl;
 
   return true;
 }
@@ -85,7 +82,7 @@ void PoroElasticity::getNodalDofTypes (std::vector<char>& dType) const
 
 void PoroElasticity::printLog () const
 {
-  IFEM::cout <<"PoroElasticity: scaling = "<< scl <<" useDynCoupling = "
+  IFEM::cout <<"PoroElasticity: useDynCoupling = "
              << std::boolalpha << useDynCoupling << std::endl;
   this->Elasticity::printLog();
 }
@@ -101,26 +98,7 @@ void PoroElasticity::setMode (SIM::SolutionMode mode)
 
 bool PoroElasticity::init (const TimeDomain& time)
 {
-  if (scl != 0.0)
-    return true; // Using value from input file
-
-  const PoroMaterial* pmat = dynamic_cast<const PoroMaterial*>(material);
-  if (pmat && time.dt > 0.0)
-  {
-    Vec3 X;
-    double rhog = pmat->getFluidDensity(X) * gravity.length();
-    Vec3 permeability = pmat->getPermeability(X);
-    if (permeability.x > 0.0)
-    {
-      scl = sqrt(pmat->getStiffness(X) * rhog / permeability.x / time.dt);
-      IFEM::cout <<"PoroElasticity: Computed scaling = "<< scl << std::endl;
-      return true;
-    }
-  }
-
-  std::cerr <<" *** PoroElasticity::init: Failed to compute scaling factor,"
-            <<" check problem set up."<< std::endl;
-  return false;
+  return true;
 }
 
 
@@ -361,22 +339,22 @@ bool PoroElasticity::evalInt (LocalIntegral& elmInt,
 
   if (!elMat.A[up_D].empty())
     this->evalDynCouplingMatrix(elMat.A[up_D], fe.basis(1), fe.grad(2),
-                                Kperm, scl / rhog * fe.detJxW);
+                                Kperm, 1.0 / rhog * fe.detJxW);
 
   this->evalPermeabilityMatrix(elMat.A[pp_P], fe.grad(2),
-                               Kperm, scl*scl/rhog*fe.detJxW);
+                               Kperm, 1.0 / rhog * fe.detJxW);
 
   if (!this->evalElasticityMatrices(elMat, Bmat, fe, X))
     return false;
 
   if (!this->evalCouplingMatrix(elMat.A[up_Q], Bmat, fe.basis(2),
-                                scl*alpha*fe.detJxW))
+                                alpha * fe.detJxW))
     return false;
 
   // In the fully static formulation, we don't need the S-matrix
   if (m_mode == SIM::DYNAMIC || !staticFlow)
     if (!this->evalCompressibilityMatrix(elMat.A[pp_S], fe.basis(2),
-                                         scl*scl*Minv*fe.detJxW))
+                                         Minv * fe.detJxW))
         return false;
 
   if (volumeFlux)

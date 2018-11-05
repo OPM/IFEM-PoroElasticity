@@ -29,5 +29,4 @@ TEST(TestSIMPoroElasticity, Parse)
   ASSERT_FLOAT_EQ(grav.x,0.0);
   ASSERT_FLOAT_EQ(grav.y,9.81);
   ASSERT_FLOAT_EQ(grav.z,0.0);
-  ASSERT_NEAR(poro->getScaling(),920642222.3,0.1);
 }

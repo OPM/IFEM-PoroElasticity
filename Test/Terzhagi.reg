@@ -28,7 +28,6 @@ Parsing <boundaryconditions>
 Parsing <poroelasticity>
   Parsing <isotropic>
 	Material code 0: Poroelastic material, see "Problem definition:" below.
-	Scaling: sc = 1
 	Analytical solution: Terzhagi (stationary), load = 1
 Parsing <timestepping>
 Parsing <newmarksolver>
@@ -49,7 +48,7 @@ Parsing input file succeeded.
 10. Preprocessing the finite element model:
 11. Poroelasticity solver
 Problem definition:
-PoroElasticity: scaling = 1 useDynCoupling = true
+PoroElasticity: useDynCoupling = true
 Elasticity: 2D, gravity = 0 9.81
 	Constitutive Properties:
 		Young's Modulus, E = 1

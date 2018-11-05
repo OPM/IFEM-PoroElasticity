@@ -20,12 +20,12 @@ Number of P-dofs      121
 Number of unknowns    832
   step=1  time=8475.82
   Primary solution summary: L2-norm            : 0.0204749
-                   Pressure L2-norm            : 0.0894779
+                   Pressure L2-norm            : 894779
                             Max Y-displacement : 0.10011
-                            Max pressure       : 0.099991
+                            Max pressure       : 999910
 
   step=2  time=16951.6
   Primary solution summary: L2-norm            : 0.0343464
-                   Pressure L2-norm            : 0.0859184
+                   Pressure L2-norm            : 859184
                             Max Y-displacement : 0.149947
-                            Max pressure       : 0.0999457
+                            Max pressure       : 999457

@@ -247,10 +247,8 @@ public:
   //! \param[in] mode The solution mode to use
   virtual void setMode(SIM::SolutionMode mode);
 
-  //! \brief Initializes the scaling factor.
+  //! \brief Initializes the integrand.
   virtual bool init(const TimeDomain& time);
-  //! \brief Returns the scaling factor.
-  double getScaling() const { return scl; }
 
   //! \brief Sets the boundary flux field.
   void setBoundaryFlux(RealFunc* f) { fluxFld = f; }
@@ -425,8 +423,6 @@ protected:
   bool residual;        //!< If \e true, compute residuals
 
 private:
-  double scl;           //!< Scaling factor
-
   bool calculateEnergy; //!< If \e true, perform energy norm calculation
   bool useDynCoupling;  //!< If \e true, include the dynamic coupling matrix
   bool staticFlow;      //!< If \e true, use a fully static formulation

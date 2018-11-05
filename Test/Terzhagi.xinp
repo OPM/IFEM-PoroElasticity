@@ -30,7 +30,6 @@
   <poroelasticity>
     <isotropic E="1.0" nu="0.4" poro="0.5" alpha="1.0" Minv="0.0"
                rhof="1.0" rhos="1.0" perm="1.0 1.0"/>
-    <scaling value="1.0"/>
     <useDynCoupling/>
     <calcEnergy/>
     <anasol type="terzhagi-stationary" height="1.0" load="1.0"/>

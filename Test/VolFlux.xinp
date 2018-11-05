@@ -13,7 +13,6 @@
 
   <poroelasticity>
     <isotropic poro="0.5" E="1" nu="0.2" alpha="1.0" Minv="1" perm="1 1 0" rhof="1000.0" rhos="2700.0" />
-    <scaling value="1" />
     <volumeflux type="expression">
       xmin=1.8; xmax=2.2; ymin=1.8; ymax=2.2; flow=1e-4;
       if(below(x,xmax),if(above(x,xmin),if(below(y,ymax),if(above(y,ymin),flow,0.0),0.0),0.0),0.0)

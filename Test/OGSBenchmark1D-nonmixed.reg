@@ -47,7 +47,7 @@ Parsing input file succeeded.
 10. Preprocessing the finite element model:
 11. Poroelasticity solver
 Problem definition:
-PoroElasticity: scaling = 0 useDynCoupling = false
+PoroElasticity: useDynCoupling = false
 Elasticity: 2D, gravity = 0 9.81
 	Constitutive Properties:
 		Young's Modulus, E = 30000
@@ -73,16 +73,15 @@ Number of dofs        207
 Number of D-dofs      138
 Number of P-dofs      69
 Number of unknowns    154
-PoroElasticity: Computed scaling = 300150
 100. Starting the simulation
   step=1  time=3.33
   Primary solution summary: L2-norm            : 0.000661656
-                   Pressure L2-norm            : 0.00300726
+                   Pressure L2-norm            : 902.629
                             Max Y-displacement : 0.0031607
-                            Max pressure       : 0.00333116
+                            Max pressure       : 999.849
   step=2  time=6.66
   Primary solution summary: L2-norm            : 0.00110025
-                   Pressure L2-norm            : 0.00288062
+                   Pressure L2-norm            : 864.618
                             Max Y-displacement : 0.00474104
-                            Max pressure       : 0.00332878
+                            Max pressure       : 999.133
   Time integration completed.

@@ -3,7 +3,7 @@ SoilColumn3D.xinp -mixed-full -halfstatic
 	Length in X = 0.001
 	Length in Y = 0.008
 	Length in Z = 0.001
-PoroElasticity: scaling = 0 useDynCoupling = false
+PoroElasticity: useDynCoupling = false
 Elasticity: 3D, gravity = 0 0 9.81
 	Constitutive Properties:
 		Young's Modulus, E = 6e+09
@@ -25,11 +25,11 @@ Number of P-dofs      343
 Number of unknowns    1246
   step=1  time=1200.2
   Primary solution summary: L2-norm            : 0.000125749
-                   Pressure L2-norm            : 0.000259295
+                   Pressure L2-norm            : 4.09947e+08
                             Max Y-displacement : 0.000387386
-                            Max pressure       : 0.000349614
+                            Max pressure       : 5.52742e+08
   step=2  time=2400.4
   Primary solution summary: L2-norm            : 0.000176973
-                   Pressure L2-norm            : 0.00011852
+                   Pressure L2-norm            : 1.87381e+08
                             Max Y-displacement : 0.000517315
-                            Max pressure       : 0.000166106
+                            Max pressure       : 2.62614e+08
