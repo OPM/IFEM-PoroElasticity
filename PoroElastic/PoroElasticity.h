@@ -19,6 +19,25 @@
 
 
 /*!
+  \brief Characteristic quantities for nondimensionalization.
+*/
+struct Characteristics {
+  double E;         //!< Characteristic Young's modulus
+  double alpha;     //!< Characteristic Biot's coefficient
+  double perm;      //!< Characteristic permeability
+  double p;         //!< Characteristic pressure
+  double t;         //!< Characteristic time
+
+  Characteristics() : E(1.0), alpha(1.0), perm(1.0), p(1.0), t(1.0) {};
+
+  void normalize() {
+    p = E / alpha;
+    t = alpha * alpha / perm / E;
+  };
+};
+
+
+/*!
   \brief Class representing the integrand of the PoroElasticity problem.
 */
 
@@ -423,6 +442,11 @@ protected:
   bool residual;        //!< If \e true, compute residuals
 
 private:
+  int ndim;             //!< Number of spatial dimensions
+
+  bool nondim;          //!< If \e true, use a nondimensionalized formulation
+  Characteristics cars; //!< Characteristic sizes (for nondimensionalization)
+
   bool calculateEnergy; //!< If \e true, perform energy norm calculation
   bool useDynCoupling;  //!< If \e true, include the dynamic coupling matrix
   bool staticFlow;      //!< If \e true, use a fully static formulation

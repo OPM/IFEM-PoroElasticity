@@ -26,12 +26,12 @@
 
 
 PoroElasticity::PoroElasticity (unsigned short int n, bool mix, bool staticFlow) :
-  Elasticity(n), staticFlow(staticFlow)
+  Elasticity(n), ndim(n), staticFlow(staticFlow)
 {
   gravity[n-1] = 9.81; // Default gravity acceleration
   npv = mix ? 0 : nsd+1; // Number of primary unknowns per node (non-mixed only)
 
-  calculateEnergy = useDynCoupling = residual = false;
+  nondim = calculateEnergy = useDynCoupling = residual = false;
 
   volumeFlux = fluxFld = nullptr;
 }
@@ -54,6 +54,23 @@ bool PoroElasticity::parse (const TiXmlElement* elem)
     std::string type;
     utl::getAttribute(elem,"type",type);
     volumeFlux = utl::parseRealFunc(elem->GetText(),type);
+  }
+  else if (!strcasecmp(elem->Value(),"nondimensionalize"))
+  {
+    nondim = true;
+    IFEM::cout << "\tNondimensionalized mode enabled" << std::endl;
+
+    // The default values of characteristics are all 1.0.
+    // Later, we will compute some of them automatically if they haven't been set in the input file.
+    // Therefore, set them to zero here (acts like a sentintel value).
+    cars.E = cars.alpha = cars.perm = 0.0;
+
+    if (utl::getAttribute(elem, "E", cars.E))
+      IFEM::cout << "\t\tCharacteristic E = " << cars.E << std::endl;
+    if (utl::getAttribute(elem, "alpha", cars.alpha))
+      IFEM::cout << "\t\tCharacteristic alpha = " << cars.alpha << std::endl;
+    if (utl::getAttribute(elem, "perm", cars.perm))
+      IFEM::cout << "\t\tCharacteristic permeability = " << cars.perm << std::endl;
   }
   else
     return this->Elasticity::parse(elem);
@@ -98,6 +115,40 @@ void PoroElasticity::setMode (SIM::SolutionMode mode)
 
 bool PoroElasticity::init (const TimeDomain& time)
 {
+  if (!nondim)
+    return true;
+
+  IFEM::cout << "PoroElasticity:" << std::endl;
+
+  const PoroMaterial* pmat = dynamic_cast<const PoroMaterial*>(material);
+  if (pmat)
+  {
+    Vec3 X;
+
+    if (cars.E == 0.0) {
+      cars.E = pmat->getStiffness(X);
+      IFEM::cout << "\tComputed characteristic E = " << cars.E << std::endl;
+    }
+
+    if (cars.alpha == 0.0) {
+      cars.alpha = pmat->getBiotCoeff(X);
+      IFEM::cout << "\tComputed characteristic alpha = " << cars.alpha << std::endl;
+    }
+
+    if (cars.perm == 0.0) {
+      Vec3 perm = pmat->getPermeability(X);
+      for (int d = 1; d <= ndim; d++)
+        cars.perm += perm(d);
+      cars.perm /= pmat->getFluidDensity(X) * gravity.length() * ndim;
+      IFEM::cout << "\tComputed characteristic permeability = " << cars.perm << std::endl;
+    }
+  }
+
+  cars.normalize();
+
+  IFEM::cout << "\tComputed characteristic pressure = " << cars.p << " [Pa]" << std::endl
+             << "\tComputed characteristic time = " << cars.t << " [s]" << std::endl;
+
   return true;
 }
 
