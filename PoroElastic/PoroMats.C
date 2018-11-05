@@ -43,6 +43,23 @@ PoroElasticity::Mats::Mats (size_t ndof_displ, size_t ndof_press,
 }
 
 
+void PoroElasticity::Mats::scaleMatrices()
+{
+  A[uu_K] /= cars.E;
+  A[up_Q] *= cars.p / cars.E;
+  A[pu_Q] /= cars.alpha;
+  A[pp_P] *= cars.t * cars.p / cars.alpha;
+  A[pp_S] *= cars.p / cars.alpha;
+}
+
+
+void PoroElasticity::Mats::scaleVectors()
+{
+  b[Fu] /= cars.E;
+  b[Fp] *= cars.t / cars.alpha;
+}
+
+
 // NOTE: This method assumes full- or half-static formulation.
 // It should be overridden in subclasses for dynamic integration.
 const Matrix& PoroElasticity::Mats::getNewtonMatrix () const
@@ -56,6 +73,8 @@ const Matrix& PoroElasticity::Mats::getNewtonMatrix () const
   // before getNewtonMatrix, as the former assumes that up_Q has the sign
   // it expects. The const-ness of these two methods is highly dubious.
   const_cast<Matrix&>(A[up_Q]) *= -1.0;
+
+  const_cast<PoroElasticity::Mats*>(this)->scaleMatrices();
 
 #if INT_DEBUG > 2
   std::cout <<"\nPoroElasticity::Mats::getNewtonMatrix:"
@@ -88,16 +107,20 @@ const Vector& PoroElasticity::Mats::getRHSVector () const
   std::cout <<"S_ext-S_int"<< b[Fu] <<"S_p"<< b[Fp];
 #endif
 
+  const_cast<PoroElasticity::Mats*>(this)->scaleVectors();
+
   // In case of half-static formulation, add some terms to the pressure
   // RHS arising from the previous timestep.
   // Fp' = Fp * h + Q_pu * u + S_pp * p
+  // Note that the nondimensionalization of the matrices in getNewtonMatrix()
+  // hasn't happened yet when this method runs, so we replicate those here.
   if (dynamic == 1) {
     Vector& fp = const_cast<Vector&>(b[Fp]);
     fp *= h;
     if (A.size() > up_Q && vec.size() > Vu)
-      A[up_Q].multiply(vec[Vu], fp, true, true);
+      A[up_Q].multiply(vec[Vu], fp, 1 / cars.alpha, 1.0, true);
     if (A.size() > pp_S && vec.size() > Vp)
-      A[pp_S].multiply(vec[Vp], fp, false, true);
+      A[pp_S].multiply(vec[Vp], fp, cars.p / cars.alpha, 1.0);
   }
 
   // Calculate residual if requested

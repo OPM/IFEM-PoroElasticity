@@ -26,7 +26,7 @@
 
 
 PoroElasticity::PoroElasticity (unsigned short int n, bool mix, bool staticFlow) :
-  Elasticity(n), ndim(n), staticFlow(staticFlow)
+  Elasticity(n), staticFlow(staticFlow)
 {
   gravity[n-1] = 9.81; // Default gravity acceleration
   npv = mix ? 0 : nsd+1; // Number of primary unknowns per node (non-mixed only)
@@ -137,9 +137,9 @@ bool PoroElasticity::init (const TimeDomain& time)
 
     if (cars.perm == 0.0) {
       Vec3 perm = pmat->getPermeability(X);
-      for (int d = 1; d <= ndim; d++)
+      for (int d = 1; d <= nsd; d++)
         cars.perm += perm(d);
-      cars.perm /= pmat->getFluidDensity(X) * gravity.length() * ndim;
+      cars.perm /= pmat->getFluidDensity(X) * gravity.length() * nsd;
       IFEM::cout << "\tComputed characteristic permeability = " << cars.perm << std::endl;
     }
   }
@@ -444,7 +444,13 @@ bool PoroElasticity::evalBouMx (LocalIntegral& elmInt,
 bool PoroElasticity::finalizeElement (LocalIntegral& elmInt,
                                       const TimeDomain& time, size_t)
 {
-  static_cast<Mats&>(elmInt).setStepSize(time.dt);
+  Mats& mats = static_cast<Mats&>(elmInt);
+
+  mats.setStepSize(time.dt);
+
+  // All scales are 1.0 if nondimensional mode is not set, so this is safe
+  mats.nondimensionalize(cars);
+
   return true;
 }
 
@@ -453,7 +459,13 @@ bool PoroElasticity::finalizeElementBou (LocalIntegral& elmInt,
                                          const FiniteElement&,
                                          const TimeDomain& time)
 {
-  static_cast<Mats&>(elmInt).setStepSize(time.dt);
+  Mats& mats = static_cast<Mats&>(elmInt);
+
+  mats.setStepSize(time.dt);
+
+  // All scales are 1.0 if nondimensional mode is not set, so this is safe
+  mats.nondimensionalize(cars);
+
   return true;
 }
 

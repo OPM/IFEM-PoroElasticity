@@ -28,8 +28,10 @@ struct Characteristics {
   double p;         //!< Characteristic pressure
   double t;         //!< Characteristic time
 
+  //! \brief Initialize to unit scaling.
   Characteristics() : E(1.0), alpha(1.0), perm(1.0), p(1.0), t(1.0) {};
 
+  //! \brief Update pressure and time scales to match physical parameters.
   void normalize() {
     p = E / alpha;
     t = alpha * alpha / perm / E;
@@ -103,11 +105,16 @@ protected:
     //! \param[in] nsd Number of space dimensions
     Mats(size_t ndof_displ, size_t ndof_press, bool neumann, char dynamic,
          bool residual, int nbasis, int nsd);
+
     //! \brief Empty destructor.
     virtual ~Mats() {}
 
     //! \brief Updates the time step size.
     void setStepSize(double dt) { h = dt; }
+
+    //! \brief Enables nondimensionalization.
+    void nondimensionalize(Characteristics cars) { this->cars = cars; }
+
     //! \brief Updates the perpendicular crack stretch.
     void setCrackStretch(double cs) { lambda = cs; }
 
@@ -117,10 +124,18 @@ protected:
     virtual const Vector& getRHSVector() const;
 
   protected:
+    //! \brief Apply nondimensional scaling to all matrices.
+    virtual void scaleMatrices();
+
+    //! \brief Apply nondimensional scaling to all right-hand-side vectors.
+    virtual void scaleVectors();
+
     double h;      //!< Current time step size
     double lambda; //!< Perpendicular crack stretch at current location
     char dynamic;  //!< Current dynamic mode (see constructor)
     bool residual; //!< Whether to calculate residuals on RHS
+
+    Characteristics cars;       //!< Characteristic sizes for nondimensionalization
   };
 
 private:
@@ -159,6 +174,15 @@ private:
     //! \brief Empty destructor.
     virtual ~NewmarkMats() {}
 
+    //! \brief Apply nondimensional scaling to all matrices.
+    virtual void scaleMatrices()
+    {
+      this->P::scaleMatrices();
+      P::A[uu_M] /= P::cars.E * P::cars.t * P::cars.t;
+      if (!P::A[up_D].empty())
+        P::A[up_D] /= P::cars.t * P::cars.alpha;
+    }
+
     //! \brief Returns the element-level Newton matrix.
     virtual const Matrix& getNewtonMatrix() const
     {
@@ -174,9 +198,12 @@ private:
       Matrices& A = const_cast<Matrices&>(P::A);
       double betah2 = beta * P::h * P::h;
       double gammah = gamma * P::h;
+      A[pu_Q].addBlock(A[up_Q], gammah, 1, 1, true);
+
+      const_cast<NewmarkMats*>(this)->scaleMatrices();
+
       A[uu_K] *= betah2 + gammah * s_damp;
       A[uu_K].add(A[uu_M], 1.0 + gammah * m_damp);
-      A[pu_Q].addBlock(A[up_Q], gammah, 1, 1, true);
       A[up_Q] *= -betah2;
       if (!A[up_D].empty())
 	A[pu_Q].addBlock(A[up_D], -1.0, 1, 1, true);
@@ -193,24 +220,28 @@ private:
     //! \brief Returns the element-level right-hand-side vector.
     virtual const Vector& getRHSVector() const
     {
+      const_cast<NewmarkMats*>(this)->scaleVectors();
+
+      Characteristics c = P::cars;
       Vector& tu = const_cast<Vector&>(P::b[Fu]);
       Vector& tp = const_cast<Vector&>(P::b[Fp]);
+
       if (P::A.size() > up_Q && P::vec.size() > Vp)
-        P::A[up_Q].multiply(P::vec[Vp],    tu, false, 1);
+        P::A[up_Q].multiply(P::vec[Vp],    tu, c.p / c.E, 1.0);
       if (P::A.size() > pp_P && P::vec.size() > Vp)
-        P::A[pp_P].multiply(P::vec[Vp],    tp, false,-1);
+        P::A[pp_P].multiply(P::vec[Vp],    tp, -c.t * c.p / c.alpha, 1.0);
       if (P::A.size() > uu_M && P::vec.size() > Vuacc)
-        P::A[uu_M].multiply(P::vec[Vuacc], tu, false,-1);
+        P::A[uu_M].multiply(P::vec[Vuacc], tu, -1.0 / (c.E * c.t * c.t), 1.0);
       if (P::A.size() > up_D && P::vec.size() > Vuacc && !P::A[up_D].empty())
-        P::A[up_D].multiply(P::vec[Vuacc], tp, true,  1);
+        P::A[up_D].multiply(P::vec[Vuacc], tp, 1.0 / (c.alpha * c.t), 1.0, true);
       if (P::A.size() > pp_S && P::vec.size() > Vpvel)
-        P::A[pp_S].multiply(P::vec[Vpvel], tp, false,-1);
+        P::A[pp_S].multiply(P::vec[Vpvel], tp, -c.p, 1.0);
       if (P::A.size() > up_Q && P::vec.size() > Vuvel)
-        P::A[up_Q].multiply(P::vec[Vuvel], tp, true, -1);
+        P::A[up_Q].multiply(P::vec[Vuvel], tp, -1.0 / c.alpha, 1.0, true);
       if (P::A.size() > uu_M && P::vec.size() > Vuvel && m_damp > 0.0)
-        P::A[uu_M].multiply(P::vec[Vuvel]*m_damp, tu, false, -1);
+        P::A[uu_M].multiply(P::vec[Vuvel]*m_damp, tu, -1.0 / (c.E * c.t * c.t), 1.0);
       if (P::A.size() > uu_K && P::vec.size() > Vuvel && s_damp > 0.0)
-        P::A[uu_K].multiply(P::vec[Vuvel]*s_damp, tu, false, -1);
+        P::A[uu_K].multiply(P::vec[Vuvel]*s_damp, tu, -1.0 / c.E, 1.0);
 #if INT_DEBUG > 2
       std::cout <<"\nPoroElasticity::NewmarkMats::getRHSVector:";
       if (P::vec.size() > Vu)
@@ -442,8 +473,6 @@ protected:
   bool residual;        //!< If \e true, compute residuals
 
 private:
-  int ndim;             //!< Number of spatial dimensions
-
   bool nondim;          //!< If \e true, use a nondimensionalized formulation
   Characteristics cars; //!< Characteristic sizes (for nondimensionalization)
 

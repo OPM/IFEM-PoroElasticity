@@ -1,0 +1,53 @@
+Terzhagi-nondim.xinp -2D -mixed-full -dyn
+
+	Nondimensionalized mode enabled
+	Computed characteristic E = 10
+	Computed characteristic alpha = 1
+	Computed characteristic permeability = 0.000101937
+	Computed characteristic pressure = 10
+	Computed characteristic time = 981
+  step=1  time=0.002
+  Displacement L2-norm            : 0.000377395
+               Max Y-displacement : 0.00225326
+  Velocity L2-norm                : 0.377395
+               Max Y-velocity     : 2.25326
+  Acceleration L2-norm            : 377.395
+               Max Y-acceleration : 2253.26
+  Pressure L2-norm                : 0.0955799
+               Max pressure       : 0.0999896
+  step=2  time=0.004
+  Displacement L2-norm            : 0.000834206
+               Max Y-displacement : 0.00432436
+  Velocity L2-norm                : 0.193925
+               Max Y-velocity     : 0.92891
+  Acceleration L2-norm            : 720.227
+               Max Y-acceleration : 4688.68
+  Pressure L2-norm                : 0.0925925
+               Max pressure       : 0.10001
+  step=3  time=0.006
+  Displacement L2-norm            : 0.00113408
+               Max Y-displacement : 0.00544357
+  Velocity L2-norm                : 0.220722
+               Max Y-velocity     : 1.30138
+  Acceleration L2-norm            : 916.54
+               Max Y-acceleration : 6172.21
+  Pressure L2-norm                : 0.0905941
+               Max pressure       : 0.0999896
+  step=4  time=0.008
+  Displacement L2-norm            : 0.00141487
+               Max Y-displacement : 0.00648594
+  Velocity L2-norm                : 0.165511
+               Max Y-velocity     : 0.851914
+  Acceleration L2-norm            : 1141.75
+               Max Y-acceleration : 7732.6
+  Pressure L2-norm                : 0.0889898
+               Max pressure       : 0.10001
+  step=5  time=0.01
+  Displacement L2-norm            : 0.00166309
+               Max Y-displacement : 0.00732092
+  Velocity L2-norm                : 0.191222
+               Max Y-velocity     : 1.09398
+  Acceleration L2-norm            : 1347.91
+               Max Y-acceleration : 9085.58
+  Pressure L2-norm                : 0.0875464
+               Max pressure       : 0.0999892

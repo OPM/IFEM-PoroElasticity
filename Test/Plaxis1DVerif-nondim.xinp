@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<simulation>
+
+  <!-- General - geometry definitions !-->
+  <geometry>
+    <raiseorder patch="1" u="1" v="1"/>
+    <refine type="uniform" patch="1" u="8" v="8"/>
+    <topologysets>
+      <set name="Vertical" type="edge">
+        <item patch="1">1 2</item>
+      </set>
+      <set name="Bottom" type="edge">
+        <item patch="1">3</item>
+      </set>
+      <set name="Top" type="edge">
+        <item patch="1">4</item>
+      </set>
+    </topologysets>
+  </geometry>
+
+  <!-- General - boundary conditions !-->
+  <boundaryconditions>
+    <dirichlet set="Vertical" basis="1" comp="1"/>
+    <dirichlet set="Bottom" basis="1" comp="12"/>
+    <dirichlet set="Top" basis="2" comp="1"/>
+    <neumann set="Top" basis="1" direction="2">-1000000.0</neumann>
+  </boundaryconditions>
+
+  <!-- Problem-specific block !-->
+  <poroelasticity>
+    <isotropic E="1000000" nu="0.0" Minv="1e-10" alpha="1.0" rhof="1000.0" rhos="2700.0"
+               perm="0.0000000115741 0.0000000115741 0.0" />
+    <nondimensionalize />
+  </poroelasticity>
+
+  <timestepping start="0" end="0.02" dt="0.01"/>
+
+</simulation>

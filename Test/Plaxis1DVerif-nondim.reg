@@ -1,0 +1,18 @@
+Plaxis1DVerif-nondim.xinp -2D -mixed -halfstatic
+	Nondimensionalized mode enabled
+	Computed characteristic E = 1e+06
+	Computed characteristic alpha = 1
+	Computed characteristic permeability = 1.17983e-12
+	Computed characteristic pressure = 1e+06
+	Computed characteristic time = 847582
+  step=1  time=0.01
+  Primary solution summary: L2-norm            : 0.0205013
+                   Pressure L2-norm            : 0.894694
+                            Max Y-displacement : 0.100195
+                            Max pressure       : 0.99981
+
+  step=2  time=0.02
+  Primary solution summary: L2-norm            : 0.0343733
+                   Pressure L2-norm            : 0.859104
+                            Max Y-displacement : 0.150025
+                            Max pressure       : 0.999357
