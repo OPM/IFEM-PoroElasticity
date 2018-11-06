@@ -23,6 +23,13 @@ upstreams=(IFEM-Elasticity)
 declare -A upstreamRev
 upstreamRev[IFEM-Elasticity]=master
 
+# Downstreams and revisions
+declare -a downstreams
+downstreams=(IFEM-OpenFrac)
+
+declare -A downstreamRev
+downstreamRev[IFEM-OpenFrac]=master
+
 IFEM_REVISION=master
 if grep -qi "ifem=" <<< $ghprbCommentBody
 then
@@ -46,5 +53,5 @@ then
   exit 0
 fi
 
-echo "Currently no downstreams"
-exit 0
+build_downstreams IFEM-PoroElasticity
+test $? -eq 0 || exit 1
