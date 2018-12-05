@@ -30,7 +30,7 @@
   <!-- Problem-specific block !-->
   <poroelasticity>
     <isotropic E="1000000" nu="0.0" Minv="1e-10" alpha="1.0" rhof="1000.0" rhos="2700.0"
-               perm="0.0000000115741 0.0000000115741 0.0" />
+               perm="0.0000000115741 0.0000000115741 0.0" mu="9810" />
     <nondimensionalize />
   </poroelasticity>
 

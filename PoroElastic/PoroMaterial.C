@@ -86,11 +86,10 @@ void PoroMaterial::parse (const TiXmlElement* elem)
 {
   propertyParse(Emod, elem, "E", "stiffness");
   propertyParse(nu, elem, "nu", "poisson");
-  if (utl::getAttribute(elem, "mu", Emod.constant))
-    Emod.constant *= 2.0 + 2.0*nu.constant;
 
   propertyParse(rhof, elem, "rhof", "fluiddensity");
   propertyParse(rhos, elem, "rhos", "soliddensity");
+  propertyParse(viscosity, elem, "mu", "viscosity");
 
   propertyParse(porosity, elem, "poro", "porosity");
   propertyParse(permeability, elem, "perm", "permeability");
@@ -152,6 +151,12 @@ double PoroMaterial::getMassDensity (const Vec3& X) const
 {
   double poro = porosity.evaluate(X);
   return rhos.evaluate(X)*(1.0-poro) + rhof.evaluate(X)*poro;
+}
+
+
+double PoroMaterial::getViscosity (const Vec3& X) const
+{
+  return viscosity.evaluate(X);
 }
 
 

@@ -139,7 +139,7 @@ bool PoroElasticity::init (const TimeDomain& time)
       Vec3 perm = pmat->getPermeability(X);
       for (int d = 1; d <= nsd; d++)
         cars.perm += perm(d);
-      cars.perm /= pmat->getFluidDensity(X) * gravity.length() * nsd;
+      cars.perm /= pmat->getViscosity(X) * nsd;
       IFEM::cout << "\tComputed characteristic permeability = " << cars.perm << std::endl;
     }
   }
@@ -377,7 +377,7 @@ bool PoroElasticity::evalInt (LocalIntegral& elmInt,
     return false;
 
   // Evaluate other material parameters
-  double rhog  = pmat->getFluidDensity(X) * gravity.length();
+  double visc  = pmat->getViscosity(X);
   double poro  = pmat->getPorosity(X);
   double alpha = pmat->getBiotCoeff(X);
   double Minv  = pmat->getBiotModulus(X,alpha,poro);
@@ -390,10 +390,10 @@ bool PoroElasticity::evalInt (LocalIntegral& elmInt,
 
   if (!elMat.A[up_D].empty())
     this->evalDynCouplingMatrix(elMat.A[up_D], fe.basis(1), fe.grad(2),
-                                Kperm, 1.0 / rhog * fe.detJxW);
+                                Kperm, 1.0 / visc * fe.detJxW);
 
   this->evalPermeabilityMatrix(elMat.A[pp_P], fe.grad(2),
-                               Kperm, 1.0 / rhog * fe.detJxW);
+                               Kperm, 1.0 / visc * fe.detJxW);
 
   if (!this->evalElasticityMatrices(elMat, Bmat, fe, X))
     return false;

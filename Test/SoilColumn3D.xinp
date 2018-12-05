@@ -41,7 +41,7 @@
   <!-- Problem-specific block !-->
   <poroelasticity>
     <isotropic poro="0.5" E="6000000000" nu="0.4" Kf="3e99" Ks="3e99" Ko="0"
-               rhof="1000.0" rhos="2700.0"
+               rhof="1000.0" rhos="2700.0" mu="9810"
                perm="0.00000000000001962 0.00000000000001962 0.0"/>
   </poroelasticity>
 

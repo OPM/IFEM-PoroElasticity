@@ -63,6 +63,8 @@ public:
   double getSolidDensity(const Vec3&) const;
   //! \brief Evaluates the mass density at current point.
   virtual double getMassDensity(const Vec3&) const;
+  //! \brief Returns the dynamic viscosity at current point.
+  double getViscosity(const Vec3& X) const;
   //! \brief Returns porosity at the current point.
   double getPorosity(const Vec3& X) const;
   //! \brief Returns permeability at the current point.
@@ -106,10 +108,11 @@ public:
                         const FiniteElement&, const Vec3& X) const;
 
 protected:
-  FuncConstPair<RealFunc> Emod; //!< Young's modulus
-  FuncConstPair<RealFunc> nu;   //!< Poisson's ratio
-  FuncConstPair<RealFunc> rhof; //!< Fluid density
-  FuncConstPair<RealFunc> rhos; //!< Solid density
+  FuncConstPair<RealFunc> Emod;         //!< Young's modulus
+  FuncConstPair<RealFunc> nu;           //!< Poisson's ratio
+  FuncConstPair<RealFunc> rhof;         //!< Fluid density
+  FuncConstPair<RealFunc> rhos;         //!< Solid density
+  FuncConstPair<RealFunc> viscosity;    //!< Dynamic viscosity
 
   FuncConstPair<RealFunc> porosity;     //!< Porosity
   FuncConstPair<VecFunc>  permeability; //!< Permeability

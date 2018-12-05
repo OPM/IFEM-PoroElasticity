@@ -33,6 +33,7 @@ TEST(TestPoroMaterial, Parse)
   Vec3 X;
   ASSERT_FLOAT_EQ(mat.getFluidDensity(X), 1000.0);
   ASSERT_FLOAT_EQ(mat.getSolidDensity(X), 2700.0);
+  ASSERT_FLOAT_EQ(mat.getViscosity(X), 9810.0);
   ASSERT_FLOAT_EQ(mat.getPorosity(X), 0.5);
   ASSERT_FLOAT_EQ(mat.getStiffness(X), 1000000.0);
   ASSERT_FLOAT_EQ(mat.getPoisson(X), 0.0);
