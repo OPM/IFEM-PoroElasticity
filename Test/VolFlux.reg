@@ -10,6 +10,6 @@ Number of unknowns    4563
   step=1  time=1
   Primary solution summary: L2-norm            : 0.00409946
                    Pressure L2-norm            : 0.0162129
-                            Max X-displacement : 0.00874564 node 849
-                            Max Y-displacement : 0.00874564 node 1169
-                            Max pressure       : 0.0688881 node 841
+                            Max X-displacement : 0.00874564
+                            Max Y-displacement : 0.00874564
+                            Max pressure       : 0.0688881
