@@ -56,7 +56,8 @@ include(IFEMTesting)
 # Regression tests
 if(MPI_FOUND)
   # Add parallel tests here
-else()
+endif()
+if(NOT MPI_FOUND OR IFEM_SERIAL_TESTS_IN_PARALLEL)
   ifem_add_test(Plaxis1DVerif.reg PoroElasticity)
   ifem_add_test(Plaxis1DVerif-mixed_C0.reg PoroElasticity)
   ifem_add_test(Plaxis1DVerif-nonmixed.reg PoroElasticity)
