@@ -149,8 +149,8 @@ double PoroMaterial::getSolidDensity (const Vec3& X) const
 
 double PoroMaterial::getMassDensity (const Vec3& X) const
 {
-  double poro = porosity.evaluate(X);
-  return rhos.evaluate(X)*(1.0-poro) + rhof.evaluate(X)*poro;
+  double poro = this->getPorosity(X);
+  return this->getSolidDensity(X)*(1.0-poro) + this->getFluidDensity(X)*poro;
 }
 
 
@@ -183,7 +183,7 @@ double PoroMaterial::getBiotCoeff (const Vec3& X) const
   if (alpha >= 0.0 && alpha <= 1.0)
     return alpha;
 
-  return 1.0 - bulkm.evaluate(X)/bulks.evaluate(X);
+  return 1.0 - this->getBulkMedium(X) / this->getBulkSolid(X);
 }
 
 
@@ -192,7 +192,7 @@ double PoroMaterial::getBiotModulus (const Vec3& X, double al, double po) const
   if (Minv >= 0.0)
     return Minv;
 
-  return (al-po)/bulks.evaluate(X) + po/bulkf.evaluate(X);
+  return (al-po) / this->getBulkSolid(X) + po / this->getBulkFluid(X);
 }
 
 
@@ -213,8 +213,8 @@ bool PoroMaterial::evaluate (Matrix& Cmat, SymmTensor& sigma, double& U,
                              const Tensor&, const SymmTensor& eps, char iop,
                              const TimeDomain*, const Tensor*) const
 {
-  double E = Emod.evaluate(X);
-  double v = nu.evaluate(X);
+  double E = this->getStiffness(X);
+  double v = this->getPoisson(X);
 
   const size_t nsd = eps.dim();
   const size_t nstrc = nsd*(nsd+1)/2;
@@ -265,8 +265,8 @@ bool PoroMaterial::evaluate (Matrix& Cmat, SymmTensor& sigma, double& U,
 bool PoroMaterial::evaluate (double& lambda, double& mu,
                              const FiniteElement&, const Vec3& X) const
 {
-  double E = Emod.evaluate(X);
-  double v = nu.evaluate(X);
+  double E = this->getStiffness(X);
+  double v = this->getPoisson(X);
 
   if (v < 0.0 || v >= 0.5)
   {

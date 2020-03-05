@@ -58,27 +58,27 @@ public:
   virtual void printLog() const;
 
   //! \brief Evaluates the mass density of the fluid at current point.
-  double getFluidDensity(const Vec3&) const;
+  virtual double getFluidDensity(const Vec3&) const;
   //! \brief Evaluates the mass density of the solid at current point.
-  double getSolidDensity(const Vec3&) const;
+  virtual double getSolidDensity(const Vec3&) const;
   //! \brief Evaluates the mass density at current point.
   virtual double getMassDensity(const Vec3&) const;
   //! \brief Returns the dynamic viscosity at current point.
-  double getViscosity(const Vec3& X) const;
+  virtual double getViscosity(const Vec3& X) const;
   //! \brief Returns porosity at the current point.
-  double getPorosity(const Vec3& X) const;
+  virtual double getPorosity(const Vec3& X) const;
   //! \brief Returns permeability at the current point.
-  Vec3 getPermeability(const Vec3& X) const;
+  virtual Vec3 getPermeability(const Vec3& X) const;
   //! \brief Returns bulk modulus of the fluid at the current point.
-  double getBulkFluid(const Vec3& X) const;
+  virtual double getBulkFluid(const Vec3& X) const;
   //! \brief Returns bulk modulus of the solid at the current point.
-  double getBulkSolid(const Vec3& X) const;
+  virtual double getBulkSolid(const Vec3& X) const;
   //! \brief Returns bulk modulus of the medium at the current point.
-  double getBulkMedium(const Vec3& X) const;
+  virtual double getBulkMedium(const Vec3& X) const;
   //! \brief Returns Biot's coefficient at the current point.
-  double getBiotCoeff(const Vec3& X) const;
+  virtual double getBiotCoeff(const Vec3& X) const;
   //! \brief Returns the inverse Biot's modulus at the current point.
-  double getBiotModulus(const Vec3& X, double al, double po) const;
+  virtual double getBiotModulus(const Vec3& X, double al, double po) const;
   //! \brief Returns stiffness at the current point.
   virtual double getStiffness(const Vec3& X) const;
   //! \brief Returns Poisson's ratio at the current point.

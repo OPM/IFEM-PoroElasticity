@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<simulation>
+
+  <geometry dim="3">
+    <patchfile>geom.g2</patchfile>
+    <refine patch="1" u="7" v="7" w="7"/>
+    <topologysets>
+      <set name="Model" type="volume">
+        <item patch="1"/>
+      </set>
+      <set name="all" type="face">
+        <item patch="1">1 2 3 4 5 6</item>
+      </set>
+      <set name="top" type="face">
+        <item patch="1">6</item>
+      </set>
+      <set name="bottom" type="face">
+        <item patch="1">5</item>
+      </set>
+      <set name="corner" type="face">
+        <item patch="1">5 6</item>
+      </set>
+      <set name="left" type="face">
+        <item patch="1">1</item>
+      </set>
+    </topologysets>
+  </geometry>
+
+  <poroelasticity>
+    <boundaryconditions>
+      <neumann set="top" direction="1">1e1</neumann>
+      <dirichlet set="bottom" comp="123" />
+      <dirichlet set="all" comp="4" />
+      <dirichlet set="left" comp="123" />
+    </boundaryconditions>
+    <porotexturematerial set="Model" rhof="1.0" rhos="1.0" nu="0.4"
+                         mu="9.81" Minv="0.0" Kf="1e99" Ks="1e99" Ko="0">
+      <property name="stiffness" file="textures_1x1.hdf5"/>
+      <property name="cellids" file="textures_1x1.hdf5"/>
+      <property name="poro" file="textures_1x1.hdf5"/>
+      <property name="permx" file="textures_1x1.hdf5"/>
+      <property name="permy" file="textures_1x1.hdf5"/>
+      <property name="permz" file="textures_1x1.hdf5"/>
+      <property name="poisson" file="textures_1x1.hdf5"/>
+    </porotexturematerial>
+  </poroelasticity>
+
+  <timestepping start="0" end="0.02" dt="0.01" />
+
+  <discretization>
+    <nGauss>2</nGauss>
+  </discretization>
+
+</simulation>

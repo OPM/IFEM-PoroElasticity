@@ -475,7 +475,7 @@ size_t PoroElasticity::getNoFields (int fld) const
   if (fld < 2)
     return nsd+1;
 
-  return nsd * (nsd + 1);
+  return nsd * (nsd + 1) + 2 + nsd;
 }
 
 
@@ -505,12 +505,28 @@ std::string PoroElasticity::getField2Name (size_t i, const char* prefix) const
   static const char* s[][6] = {{"x", "y", "xy", "", "", ""},
                                {"x", "y", "z", "yz", "xz", "xy"}};
 
-  size_t ncmp = nsd * (nsd + 1) / 2;
-  std::string name = std::string(i < ncmp ? "eps_" : "sig_") + s[nsd-2][i%ncmp];
-  if (!prefix)
-    return name;
 
-  return prefix + std::string(" ") + name;
+  size_t ncmp = nsd * (nsd + 1) / 2;
+  if (i >= ncmp*2) {
+    std::string name;
+    i -= ncmp*2;
+    if (i == 0)
+      name = "poro";
+    else if (i == 1)
+      name = "rhos";
+    else {
+      name = "permx";
+      name.back() += (i-2);
+    }
+    if (!prefix)
+      return name;
+    return prefix + std::string(" ") + name;
+  } else {
+    std::string name = std::string(i < ncmp ? "eps_" : "sig_") + s[nsd-2][i%ncmp];
+    if (!prefix)
+      return name;
+    return prefix + std::string(" ") + name;
+  }
 }
 
 
@@ -560,13 +576,24 @@ bool PoroElasticity::evalSol (Vector& s, const FiniteElement& fe,
   if (!Bmat.multiply(disp,eps))
     return false;
 
+  double p[3] = {fe.u, fe.v, fe.w};
+  Vec4 Xt(X);
+  Xt.u = p;
+
   Matrix Cmat; double U = 0.0;
-  if (!material->evaluate(Cmat,sigma,U,fe,X,eps,eps))
+  if (!material->evaluate(Cmat,sigma,U,fe,Xt,eps,eps))
     return false;
 
   s = eps;
   const RealArray& sig = sigma;
   s.insert(s.end(),sig.begin(),sig.end());
+  s.push_back(static_cast<const PoroMaterial*>(material)->getPorosity(Xt));
+  s.push_back(static_cast<const PoroMaterial*>(material)->getFluidDensity(Xt));
+  Vec3 perm = static_cast<const PoroMaterial*>(material)->getPermeability(Xt);
+  s.push_back(perm[0]);
+  s.push_back(perm[1]);
+  if (nsd == 3)
+    s.push_back(perm[2]);
 
   return true;
 }
