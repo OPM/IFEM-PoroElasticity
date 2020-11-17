@@ -57,45 +57,20 @@ VecFunc* PoroMaterial::FuncConstPair<VecFunc>::parse (const char* val,
 }
 
 
-/*!
-  \brief Template function to parse a property value from an XML-element.
-*/
-
-template<class T>
-static bool propertyParse (PoroMaterial::FuncConstPair<T>& data,
-                           const TiXmlElement* elem,
-                           const char* attr, const char* tag)
-{
-  if (utl::getAttribute(elem,attr,data.constant))
-    return true;
-
-  const TiXmlElement* child = elem->FirstChildElement(tag);
-  const TiXmlNode* aval = child ? child->FirstChild() : nullptr;
-  if (!aval) return false;
-
-  IFEM::cout <<" ";
-  std::string type;
-  utl::getAttribute(child,"type",type,true);
-  data.function = data.parse(aval->Value(),type);
-
-  return data.function != nullptr;
-}
-
-
 void PoroMaterial::parse (const TiXmlElement* elem)
 {
-  propertyParse(Emod, elem, "E", "stiffness");
-  propertyParse(nu, elem, "nu", "poisson");
+  Emod.propertyParse(elem, "E", "stiffness");
+  nu.propertyParse(elem, "nu", "poisson");
 
-  propertyParse(rhof, elem, "rhof", "fluiddensity");
-  propertyParse(rhos, elem, "rhos", "soliddensity");
-  propertyParse(viscosity, elem, "mu", "viscosity");
+  rhof.propertyParse(elem, "rhof", "fluiddensity");
+  rhos.propertyParse(elem, "rhos", "soliddensity");
+  viscosity.propertyParse(elem, "mu", "viscosity");
 
-  propertyParse(porosity, elem, "poro", "porosity");
-  propertyParse(permeability, elem, "perm", "permeability");
-  propertyParse(bulkf, elem, "Kf", "fluidbulk");
-  propertyParse(bulks, elem, "Ks", "solidbulk");
-  propertyParse(bulkm, elem, "Ko", "mediumbulk");
+  porosity.propertyParse(elem, "poro", "porosity");
+  permeability.propertyParse(elem, "perm", "permeability");
+  bulkf.propertyParse(elem, "Kf", "fluidbulk");
+  bulks.propertyParse(elem, "Ks", "solidbulk");
+  bulkm.propertyParse(elem, "Ko", "mediumbulk");
 
   utl::getAttribute(elem, "alpha", alpha);
   utl::getAttribute(elem, "Minv", Minv);

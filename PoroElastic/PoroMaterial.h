@@ -16,8 +16,9 @@
 
 #include "MaterialBase.h"
 #include "Function.h"
-
-class TiXmlElement;
+#include "IFEM.h"
+#include "Utilities.h"
+#include <tinyxml.h>
 
 
 /*!
@@ -43,6 +44,28 @@ public:
     typename Function::Output evaluate(const typename Function::Input& X) const
     {
       return function ? (*function)(X) : constant;
+    }
+
+    //! \brief Parse a property value from an XML-element.
+    //! \param elem XML element to parse
+    //! \param attr Attribute for constant value
+    //! \param tag Tag for function value
+    bool propertyParse(const TiXmlElement* elem,
+                       const char* attr, const char* tag)
+    {
+      if (utl::getAttribute(elem,attr,constant))
+        return true;
+
+      const TiXmlElement* child = elem->FirstChildElement(tag);
+      const TiXmlNode* aval = child ? child->FirstChild() : nullptr;
+      if (!aval) return false;
+
+      IFEM::cout <<" ";
+      std::string type;
+      utl::getAttribute(child,"type",type,true);
+      function = parse(aval->Value(),type);
+
+      return function != nullptr;
     }
   };
 
