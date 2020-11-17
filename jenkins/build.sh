@@ -25,10 +25,12 @@ upstreamRev[IFEM-Elasticity]=master
 
 # Downstreams and revisions
 declare -a downstreams
-downstreams=(IFEM-OpenFrac)
+downstreams=(IFEM-OpenFrac
+             IFEM-THM)
 
 declare -A downstreamRev
 downstreamRev[IFEM-OpenFrac]=master
+downstreamRev[IFEM-THM]=master
 
 IFEM_REVISION=master
 if grep -qi "ifem=" <<< $ghprbCommentBody
