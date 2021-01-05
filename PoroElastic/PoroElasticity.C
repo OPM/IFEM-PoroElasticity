@@ -534,7 +534,7 @@ bool PoroElasticity::evalSol (Vector& s, const MxFiniteElement& fe,
   Vector pressure;
   utl::gather(MNPC2, 1, primsol.front(), pressure);
 
-  return this->evalSol(s,fe,X,displacement,pressure);
+  return this->evalSol(s,fe,X,displacement,pressure.dot(fe.basis(2)));
 }
 
 
@@ -545,20 +545,17 @@ bool PoroElasticity::evalSol (Vector& s, const FiniteElement& fe,
   utl::gather(MNPC,npv,primsol.front(),eV);
 
   Vector displacement(nsd * fe.N.size());
-  Vector pressure(fe.N.size());
-  for (size_t a = 0; a < fe.N.size(); a++)
-  {
-    pressure[a] = eV[npv*a + nsd];
-    for (size_t i = 0; i < nsd; i++)
+  for (size_t i = 0; i < nsd; i++)
+    for (size_t a = 0; a < fe.N.size(); a++)
       displacement[nsd*a+i] = eV[npv*a+i];
-  }
 
+  double pressure = eV.dot(fe.N, nsd, nsd+1);
   return this->evalSol(s,fe,X,displacement,pressure);
 }
 
 
 bool PoroElasticity::evalSol (Vector& s, const FiniteElement& fe,
-                              const Vec3& X, const Vector& disp, const Vector& press) const
+                              const Vec3& X, const Vector& disp, double pressure) const
 {
   if (!material)
   {
@@ -582,7 +579,6 @@ bool PoroElasticity::evalSol (Vector& s, const FiniteElement& fe,
   const RealArray& sig = sigma;
   s.insert(s.end(),sig.begin(),sig.end());
 
-  double pressure = press.dot(fe.N);
   const PoroMaterial* pmat = dynamic_cast<const PoroMaterial*>(material);
   double alpha = pmat->getBiotCoeff(X);
   double porosity = pmat->getPorosity(X);
