@@ -92,7 +92,8 @@ template<class Dim, class Sim> int runSimulator (char* infile, double stopTime)
   // Load initial conditions unless a restart
   if (model.opt.restartFile.empty())
     model.setInitialConditions();
-  else if (solver.restart(model.opt.restartFile,model.opt.restartStep) < 0)
+  else if (solver.restart(model.opt.restartFile,
+                         model.getProcessAdm(),model.opt.restartStep) < 0)
     return 2;
 
   // HDF5 output
