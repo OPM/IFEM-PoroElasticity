@@ -17,6 +17,7 @@
 #include "SIMStatPoroElasticity.h"
 #include "SIMDynPoroElasticity.h"
 #include "SIMSolver.h"
+#include "ASMmxBase.h"
 #include "GenAlphaSIM.h"
 #include "Profiler.h"
 
