@@ -25,7 +25,7 @@ template<class Dim> class SIMPoroElasticity : public SIMElasticityWrap<Dim>
 {
 public:
   //! \brief The default constructor sets the solution dimension for each basis.
-  SIMPoroElasticity();
+  explicit SIMPoroElasticity(const std::vector<unsigned char>& = {});
 
   //! \brief Empty destructor.
   virtual ~SIMPoroElasticity() {}

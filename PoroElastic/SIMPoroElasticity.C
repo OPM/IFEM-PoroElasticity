@@ -27,7 +27,7 @@
 
 
 template<class Dim>
-SIMPoroElasticity<Dim>::SIMPoroElasticity ()
+SIMPoroElasticity<Dim>::SIMPoroElasticity (const std::vector<unsigned char>&)
 {
   if (ASMmxBase::Type > ASMmxBase::NONE)
     Dim::nf = { Dim::dimension, 1 }; // mixed formulation
