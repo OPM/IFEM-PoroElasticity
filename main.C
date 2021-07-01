@@ -11,6 +11,7 @@
 //!
 //==============================================================================
 
+#include "ElasticityUtils.h"
 #include "IFEM.h"
 #include "SIM2D.h"
 #include "SIM3D.h"

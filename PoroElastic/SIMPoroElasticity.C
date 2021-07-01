@@ -17,7 +17,9 @@
 #include "PoroMaterial.h"
 #include "PoroSolutions.h"
 
+#include "AnaSol.h"
 #include "ASMmxBase.h"
+#include "Functions.h"
 #include "SAM.h"
 #include "SIM2D.h"
 #include "SIM3D.h"
