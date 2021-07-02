@@ -15,6 +15,9 @@
 #include "PoroSolutions.h"
 #include "PoroMaterial.h"
 
+#include "AnaSol.h"
+#include "Functions.h"
+
 
 template<> bool SIMPoroEl2D::parseDimSpecific (const TiXmlElement* elem)
 {

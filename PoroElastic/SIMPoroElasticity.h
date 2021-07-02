@@ -18,7 +18,11 @@
 #include "SIM2D.h"
 #include "SAM.h"
 #include "PoroElasticity.h"
+#include "AnaSol.h"
 #include "ASMmxBase.h"
+#include "IFEM.h"
+#include "Utilities.h"
+
 #include "tinyxml.h"
 
 
