@@ -31,10 +31,10 @@ public:
   virtual ~SIMPoroElasticity() {}
 
   //! \brief Returns the name of this simulator (for use in the HDF5 export).
-  virtual std::string getName() const { return "PoroElasticity"; }
+  std::string getName() const override { return "PoroElasticity"; }
 
   //! \brief Computes the solution for the current time step.
-  virtual bool solveStep(TimeStep& tp);
+  bool solveStep(TimeStep& tp) override;
 
   //! \brief Evaluates some iteration norms for convergence assessment.
   //! \param[in] u Global primary solution vector
@@ -42,30 +42,30 @@ public:
   //! \param[out] eNorm Energy norm of solution increment
   //! \param[out] rNorm Residual norm of solution increment
   //! \param[out] dNorm Displacement norm of solution increment
-  virtual void iterationNorms(const Vector& u, const Vector& r,
-                              double& eNorm, double& rNorm, double& dNorm) const;
+  void iterationNorms(const Vector& u, const Vector& r,
+                      double& eNorm, double& rNorm, double& dNorm) const override;
 
   //! \brief Prints a summary of the calculated solution to std::cout.
-  virtual void printSolutionSummary(const Vector& solution, int = 0,
-                                    const char* = nullptr, std::streamsize = 0);
+  void printSolutionSummary(const Vector& solution, int = 0,
+                            const char* = nullptr, std::streamsize = 0) override;
 
   //! \brief Computes energy norms on the converged solution.
   bool postSolve(TimeStep& tp);
 
   //! \brief Initializes for integration of Neumann terms for a given property.
-  virtual bool initNeumann(size_t propInd);
+  bool initNeumann(size_t propInd) override;
 
 protected:
   //! \brief Returns the actual integrand.
-  virtual Elasticity* getIntegrand();
+  Elasticity* getIntegrand() override;
 
   using SIMElasticityWrap<Dim>::parse;
   //! \brief Parses a data section from an XML element
-  virtual bool parse(const TiXmlElement* elem);
+  bool parse(const TiXmlElement* elem) override;
 
   using SIMElasticityWrap<Dim>::parseAnaSol;
   //! \brief Parses the analytical solution from an XML element.
-  virtual bool parseAnaSol(const TiXmlElement* elem);
+  bool parseAnaSol(const TiXmlElement* elem) override;
 
   //! \brief Parses dimension-specific analytical solution from an XML element.
   bool parseDimSpecific(const TiXmlElement*) { return false; }
