@@ -11,6 +11,7 @@
 //==============================================================================
 
 #include "SIMPoroElasticity.h"
+#include "PoroElasticity.h"
 #include "SIM2D.h"
 #include "TimeStep.h"
 

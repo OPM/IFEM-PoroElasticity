@@ -15,7 +15,7 @@
 #define _SIM_STAT_PORO_ELASTICITY_H_
 
 #include "SIMPoroElasticity.h"
-
+#include "PoroElasticity.h"
 
 /*!
   \brief Driver class for quasi-static poroelasticity problems.
