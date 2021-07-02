@@ -30,7 +30,7 @@ template<class Dim> class SIMPoroElasticity : public SIMElasticityWrap<Dim>
 {
 public:
   //! \brief The default constructor sets the solution dimension for each basis.
-  SIMPoroElasticity()
+  SIMPoroElasticity(const std::vector<unsigned char>& = {})
   {
     if (ASMmxBase::Type > ASMmxBase::NONE)
       Dim::nf = { Dim::dimension, 1 }; // mixed formulation
