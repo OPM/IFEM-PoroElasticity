@@ -707,7 +707,7 @@ bool PoroNorm::evalInt (LocalIntegral& elmInt, const FiniteElement& fe,
   if (pressure)
   {
     double press_a = (*pressure)(Vec4(X,time.t));
-    norms[np++] += (press_a - press_h) * (press_a - press_h) * fe.detJxW;
+    norms[np] += (press_a - press_h) * (press_a - press_h) * fe.detJxW;
   }
 
   return true;
