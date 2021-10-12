@@ -580,6 +580,11 @@ bool PoroElasticity::evalSol (Vector& s, const FiniteElement& fe,
   s.insert(s.end(),sig.begin(),sig.end());
 
   const PoroMaterial* pmat = dynamic_cast<const PoroMaterial*>(material);
+  if (!pmat) {
+    std::cerr <<" *** PoroElasticity::evalSol: Wrong material data."<< std::endl;
+    return false;
+  }
+
   double alpha = pmat->getBiotCoeff(X);
   double porosity = pmat->getPorosity(X);
   double Minv = pmat->getBiotModulus(X, alpha, porosity);
