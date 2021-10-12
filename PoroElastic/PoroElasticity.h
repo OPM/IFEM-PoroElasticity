@@ -501,9 +501,9 @@ public:
   //! \param[in] d_disp Derivative of displacement (optional)
   //! \param[in] press Pressure solution (optional)
   //! \param[in] d_press Derivative of pressure (optional)
-  PoroNorm(PoroElasticity& poroel,
-           VecFunc* disp = nullptr, TensorFunc* d_disp = nullptr,
-           RealFunc* press = nullptr, VecFunc* d_press = nullptr);
+  explicit PoroNorm(PoroElasticity& poroel,
+                    VecFunc* disp = nullptr, TensorFunc* d_disp = nullptr,
+                    RealFunc* press = nullptr, VecFunc* d_press = nullptr);
   //! \brief Empty destructor.
   virtual ~PoroNorm() {}
 
