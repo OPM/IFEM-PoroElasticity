@@ -503,14 +503,13 @@ std::string PoroElasticity::getField1Name (size_t i, const char* prefix) const
 
 std::string PoroElasticity::getField2Name (size_t i, const char* prefix) const
 {
-  static const char* s[][6] = {{"x", "y", "xy", "", "", ""},
-                               {"x", "y", "z", "yz", "xz", "xy"}};
-
   size_t ncmp = nsd * (nsd + 1) / 2;
   std::string name;
-  if (i < 2 * ncmp)
+  if (i < 2 * ncmp) {
+    static const char* s[][6] = {{"x", "y", "xy", "", "", ""},
+                                 {"x", "y", "z", "yz", "xz", "xy"}};
     name = std::string(i < ncmp ? "eps_" : "sig_") + s[nsd-2][i%ncmp];
-  else
+  } else
     name = "FluidContent";
 
   if (!prefix)
