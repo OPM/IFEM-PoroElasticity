@@ -113,7 +113,7 @@ protected:
     void setStepSize(double dt) { h = dt; }
 
     //! \brief Enables nondimensionalization.
-    void nondimensionalize(Characteristics c) { cars = c; }
+    void nondimensionalize(const Characteristics& c) { cars = c; }
 
     //! \brief Updates the perpendicular crack stretch.
     void setCrackStretch(double cs) { lambda = cs; }
