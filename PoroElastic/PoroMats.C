@@ -29,7 +29,7 @@ PoroElasticity::Mats::Mats (size_t ndof_displ, size_t ndof_press,
   this->redim(2, ndof_press, 1, nbasis);
   this->redimOffDiag(3,0);
   this->redimOffDiag(4,0);
-  this->redimNewtonMat();
+  this->finalize();
 
   if (withLHS) {
     if (dynamic > 1)
