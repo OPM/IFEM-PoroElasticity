@@ -110,7 +110,7 @@ protected:
     virtual ~Mats() {}
 
     //! \brief Updates the time step size.
-    void setStepSize(double dt) { h = dt; }
+    void setStepSize(double dt, int = 0) override { h = dt; }
 
     //! \brief Enables nondimensionalization.
     void nondimensionalize(const Characteristics& c) { cars = c; }
@@ -119,9 +119,9 @@ protected:
     void setCrackStretch(double cs) { lambda = cs; }
 
     //! \brief Returns the element level Newton matrix.
-    virtual const Matrix& getNewtonMatrix() const;
+    const Matrix& getNewtonMatrix() const override;
     //! \brief Returns the element level right-hand-side vector.
-    virtual const Vector& getRHSVector() const;
+    const Vector& getRHSVector() const override;
 
   protected:
     //! \brief Applies nondimensional scaling to all matrices.
