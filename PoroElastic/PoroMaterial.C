@@ -18,7 +18,6 @@
 #include "Vec3Oper.h"
 #include "MatVec.h"
 #include "IFEM.h"
-#include "tinyxml.h"
 
 
 /*!
@@ -57,7 +56,7 @@ VecFunc* PoroMaterial::FuncConstPair<VecFunc>::parse (const char* val,
 }
 
 
-void PoroMaterial::parse (const TiXmlElement* elem)
+void PoroMaterial::parse (const tinyxml2::XMLElement* elem)
 {
   Emod.propertyParse(elem, "E", "stiffness");
   nu.propertyParse(elem, "nu", "poisson");

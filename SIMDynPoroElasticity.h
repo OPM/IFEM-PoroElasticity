@@ -15,7 +15,6 @@
 #define _SIM_DYN_PORO_ELASTICITY_H_
 
 #include "SIMPoroElasticity.h"
-#include "NewmarkSIM.h"
 
 
 /*!
@@ -105,7 +104,7 @@ protected:
 
   using SIMPoroElasticity<Dim>::parse;
   //! \brief Parses a data section from an XML element.
-  virtual bool parse(const TiXmlElement* elem)
+  virtual bool parse(const tinyxml2::XMLElement* elem)
   {
     bool result = true;
     static short int ncall = 0;

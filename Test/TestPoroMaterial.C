@@ -13,19 +13,19 @@
 #include "PoroMaterial.h"
 
 #include "gtest/gtest.h"
-#include "tinyxml.h"
+#include "tinyxml2.h"
 
 TEST(TestPoroMaterial, Parse)
 {
-  TiXmlDocument doc;
+  tinyxml2::XMLDocument doc;
   doc.LoadFile("Plaxis1DVerif.xinp");
   if (!doc.RootElement())
     ASSERT_TRUE(false);
 
-  const TiXmlElement* elem = doc.RootElement()->FirstChildElement("poroelasticity");
+  const tinyxml2::XMLElement* elem = doc.RootElement()->FirstChildElement("poroelasticity");
   ASSERT_TRUE(elem != nullptr);
 
-  const TiXmlElement* iso = elem->FirstChildElement("isotropic");
+  const tinyxml2::XMLElement* iso = elem->FirstChildElement("isotropic");
 
   PoroMaterial mat;
   mat.parse(iso);

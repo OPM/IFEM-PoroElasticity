@@ -18,7 +18,7 @@
 #include "Function.h"
 #include "IFEM.h"
 #include "Utilities.h"
-#include <tinyxml.h>
+#include <tinyxml2.h>
 
 
 /*!
@@ -50,14 +50,14 @@ public:
     //! \param elem XML element to parse
     //! \param attr Attribute for constant value
     //! \param tag Tag for function value
-    bool propertyParse(const TiXmlElement* elem,
+    bool propertyParse(const tinyxml2::XMLElement* elem,
                        const char* attr, const char* tag)
     {
       if (utl::getAttribute(elem,attr,constant))
         return true;
 
-      const TiXmlElement* child = elem->FirstChildElement(tag);
-      const TiXmlNode* aval = child ? child->FirstChild() : nullptr;
+      const tinyxml2::XMLElement* child = elem->FirstChildElement(tag);
+      const tinyxml2::XMLNode* aval = child ? child->FirstChild() : nullptr;
       if (!aval) return false;
 
       IFEM::cout <<" ";
@@ -75,7 +75,7 @@ public:
   virtual ~PoroMaterial() {}
 
   //! \brief Parses material parameters from an XML element.
-  virtual void parse(const TiXmlElement* elem);
+  virtual void parse(const tinyxml2::XMLElement* elem);
 
   //! \brief Prints out material parameters to the log stream.
   virtual void printLog() const;

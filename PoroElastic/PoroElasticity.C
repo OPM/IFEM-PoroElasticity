@@ -22,7 +22,7 @@
 #include "Tensor.h"
 #include "Vec3Oper.h"
 #include "IFEM.h"
-#include "tinyxml.h"
+#include "tinyxml2.h"
 
 
 PoroElasticity::PoroElasticity (unsigned short int n, bool mix, bool staticFlow) :
@@ -43,7 +43,7 @@ PoroElasticity::~PoroElasticity ()
 }
 
 
-bool PoroElasticity::parse (const TiXmlElement* elem)
+bool PoroElasticity::parse (const tinyxml2::XMLElement* elem)
 {
   if (!strncasecmp(elem->Value(),"calcEn",6))
     calculateEnergy = true;
@@ -79,7 +79,7 @@ bool PoroElasticity::parse (const TiXmlElement* elem)
 }
 
 
-Material* PoroElasticity::parseMatProp (const TiXmlElement* elem, bool)
+Material* PoroElasticity::parseMatProp (const tinyxml2::XMLElement* elem, bool)
 {
   IFEM::cout <<" Poroelastic material, see \"Problem definition:\" below."
              << std::endl;

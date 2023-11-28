@@ -61,14 +61,14 @@ protected:
 
   using SIMElasticityWrap<Dim>::parse;
   //! \brief Parses a data section from an XML element
-  bool parse(const TiXmlElement* elem) override;
+  bool parse(const tinyxml2::XMLElement* elem) override;
 
   using SIMElasticityWrap<Dim>::parseAnaSol;
   //! \brief Parses the analytical solution from an XML element.
-  bool parseAnaSol(const TiXmlElement* elem) override;
+  bool parseAnaSol(const tinyxml2::XMLElement* elem) override;
 
   //! \brief Parses dimension-specific analytical solution from an XML element.
-  bool parseDimSpecific(const TiXmlElement*) { return false; }
+  bool parseDimSpecific(const tinyxml2::XMLElement*) { return false; }
 
 private:
   double scaleD; //!< Displacement DOF scaling in convergence checks

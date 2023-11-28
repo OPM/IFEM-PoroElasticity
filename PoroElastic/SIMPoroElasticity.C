@@ -165,11 +165,11 @@ Elasticity* SIMPoroElasticity<Dim>::getIntegrand ()
 
 
 template<class Dim>
-bool SIMPoroElasticity<Dim>::parse (const TiXmlElement* elem)
+bool SIMPoroElasticity<Dim>::parse (const tinyxml2::XMLElement* elem)
 {
   if (!strcasecmp(elem->Value(),"poroelasticity"))
   {
-    const TiXmlElement* child = elem->FirstChildElement();
+    const tinyxml2::XMLElement* child = elem->FirstChildElement();
     for (; child; child = child->NextSiblingElement())
       if (!strcasecmp(child->Value(),"normscaling"))
       {
@@ -184,7 +184,7 @@ bool SIMPoroElasticity<Dim>::parse (const TiXmlElement* elem)
 
 
 template<class Dim>
-bool SIMPoroElasticity<Dim>::parseAnaSol (const TiXmlElement* elem)
+bool SIMPoroElasticity<Dim>::parseAnaSol (const tinyxml2::XMLElement* elem)
 {
   if (Dim::mySol || this->parseDimSpecific(elem))
     return true;
@@ -197,7 +197,7 @@ bool SIMPoroElasticity<Dim>::parseAnaSol (const TiXmlElement* elem)
 
 //! \brief Template specialization - 2D specific input parsing.
 template<>
-bool SIMPoroElasticity<SIM2D>::parseDimSpecific (const TiXmlElement* elem)
+bool SIMPoroElasticity<SIM2D>::parseDimSpecific (const tinyxml2::XMLElement* elem)
 {
   std::string type;
   utl::getAttribute(elem,"type",type,true);
