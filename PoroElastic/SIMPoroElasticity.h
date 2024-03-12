@@ -43,11 +43,13 @@ public:
   //! \param[out] rNorm Residual norm of solution increment
   //! \param[out] dNorm Displacement norm of solution increment
   void iterationNorms(const Vector& u, const Vector& r,
-                      double& eNorm, double& rNorm, double& dNorm) const override;
+                      double& eNorm, double& rNorm,
+                      double& dNorm) const override;
 
   //! \brief Prints a summary of the calculated solution to std::cout.
   void printSolutionSummary(const Vector& solution, int = 0,
-                            const char* = nullptr, std::streamsize = 0) override;
+                            const char* = nullptr,
+                            std::streamsize = 0) override;
 
   //! \brief Computes energy norms on the converged solution.
   bool postSolve(TimeStep& tp);
@@ -57,7 +59,7 @@ public:
 
 protected:
   //! \brief Returns the actual integrand.
-  Elasticity* getIntegrand() override;
+  ElasticBase* getIntegrand() override;
 
   using SIMElasticityWrap<Dim>::parse;
   //! \brief Parses a data section from an XML element

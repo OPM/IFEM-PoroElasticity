@@ -156,11 +156,12 @@ bool SIMPoroElasticity<Dim>::initNeumann (size_t propInd)
 
 
 template<class Dim>
-Elasticity* SIMPoroElasticity<Dim>::getIntegrand ()
+ElasticBase* SIMPoroElasticity<Dim>::getIntegrand ()
 {
   if (!Dim::myProblem)
     Dim::myProblem = new PoroElasticity(Dim::dimension, Dim::nf.size() > 1);
-  return static_cast<Elasticity*>(Dim::myProblem);
+
+  return static_cast<ElasticBase*>(Dim::myProblem);
 }
 
 
@@ -196,8 +197,8 @@ bool SIMPoroElasticity<Dim>::parseAnaSol (const tinyxml2::XMLElement* elem)
 
 
 //! \brief Template specialization - 2D specific input parsing.
-template<>
-bool SIMPoroElasticity<SIM2D>::parseDimSpecific (const tinyxml2::XMLElement* elem)
+template<> bool
+SIMPoroElasticity<SIM2D>::parseDimSpecific (const tinyxml2::XMLElement* elem)
 {
   std::string type;
   utl::getAttribute(elem,"type",type,true);
@@ -208,7 +209,7 @@ bool SIMPoroElasticity<SIM2D>::parseDimSpecific (const tinyxml2::XMLElement* ele
     utl::getAttribute(elem,"load",load);
     IFEM::cout <<"\tAnalytical solution: Terzhagi, height = "<< height
                <<" load = "<< load << std::endl;
-    Elasticity* elp = this->getIntegrand();
+    ElasticBase* elp = this->getIntegrand();
     PoroMaterial* pmat = static_cast<PoroMaterial*>(elp->getMaterial());
     double gacc = elp->getGravity().length();
     SIM2D::mySol = new AnaSol(new TerzhagiPressure(pmat,gacc,height,load));
@@ -219,7 +220,7 @@ bool SIMPoroElasticity<SIM2D>::parseDimSpecific (const tinyxml2::XMLElement* ele
     utl::getAttribute(elem,"load",load);
     IFEM::cout <<"\tAnalytical solution: Terzhagi (stationary),"
                <<" load = "<< load << std::endl;
-    Elasticity* elp = this->getIntegrand();
+    ElasticBase* elp = this->getIntegrand();
     PoroMaterial* pmat = static_cast<PoroMaterial*>(elp->getMaterial());
     SIM2D::mySol = new AnaSol(new ConstFunc(0.0), nullptr,
                               new StationaryTerzhagiDisplacement(pmat,load));
