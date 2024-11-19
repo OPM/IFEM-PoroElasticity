@@ -94,8 +94,8 @@ void SIMPoroElasticity<Dim>::printSolutionSummary(const Vector& solution, int,
                                                   const char*, std::streamsize)
 {
   const size_t nsd = this->getNoSpaceDim();
-  size_t iMax[nsd+1];
-  double dMax[nsd+1];
+  size_t iMax[4];
+  double dMax[4];
   double dNorm = this->solutionNorms(solution,dMax,iMax,nsd);
   double pNorm = this->solutionNorms(solution,dMax+nsd,iMax+nsd,1,'P');
 
