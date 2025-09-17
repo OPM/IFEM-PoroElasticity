@@ -84,10 +84,10 @@ endif()
 list(APPEND TEST_APPS PoroElasticity)
 
 # Unit tests
-IFEM_add_test_app(${PROJECT_SOURCE_DIR}/Test/*.C
-                  ${PROJECT_SOURCE_DIR}/Test
-                  PoroElasticity 0
-                  PoroElastic Elasticity ${IFEM_LIBRARIES})
+IFEM_add_test_app(SOURCES ${PROJECT_SOURCE_DIR}/Test/*.C
+                  WORKDIR ${PROJECT_SOURCE_DIR}/Test
+                  NAME PoroElasticity
+                  LIBRARIES PoroElastic Elasticity ${IFEM_LIBRARIES})
 
 if(IFEM_COMMON_APP_BUILD)
   set(TEST_APPS ${TEST_APPS} PARENT_SCOPE)
