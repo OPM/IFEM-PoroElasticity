@@ -15,19 +15,23 @@
 #include "SIM2D.h"
 #include "TimeStep.h"
 
-#include "gtest/gtest.h"
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
+
+using Catch::Matchers::WithinAbs;
+using Catch::Matchers::WithinRel;
 
 
-TEST(TestSIMPoroElasticity, Parse)
+TEST_CASE("TestSIMPoroElasticity.Parse")
 {
   SIMPoroElasticity<SIM2D> sim;
-  ASSERT_TRUE(sim.read("Plaxis1DVerif.xinp"));
-  ASSERT_TRUE(sim.init(TimeStep()));
+  REQUIRE(sim.read("Plaxis1DVerif.xinp"));
+  REQUIRE(sim.init(TimeStep()));
 
   const PoroElasticity* poro = static_cast<const PoroElasticity*>(sim.getProblem());
 
   Vec3 grav = poro->getGravity();
-  ASSERT_FLOAT_EQ(grav.x,0.0);
-  ASSERT_FLOAT_EQ(grav.y,9.81);
-  ASSERT_FLOAT_EQ(grav.z,0.0);
+  REQUIRE_THAT(grav.x, WithinAbs(0.0, 1e-14));
+  REQUIRE_THAT(grav.y, WithinRel(9.81));
+  REQUIRE_THAT(grav.z, WithinAbs(0.0, 1e-14));
 }

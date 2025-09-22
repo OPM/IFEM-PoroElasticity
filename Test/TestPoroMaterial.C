@@ -12,18 +12,22 @@
 
 #include "PoroMaterial.h"
 
-#include "gtest/gtest.h"
-#include "tinyxml2.h"
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
+#include <tinyxml2.h>
 
-TEST(TestPoroMaterial, Parse)
+using Catch::Matchers::WithinAbs;
+using Catch::Matchers::WithinRel;
+
+
+TEST_CASE("TestPoroMaterial.Parse")
 {
   tinyxml2::XMLDocument doc;
   doc.LoadFile("Plaxis1DVerif.xinp");
-  if (!doc.RootElement())
-    ASSERT_TRUE(false);
+  REQUIRE(doc.RootElement());
 
   const tinyxml2::XMLElement* elem = doc.RootElement()->FirstChildElement("poroelasticity");
-  ASSERT_TRUE(elem != nullptr);
+  REQUIRE(elem != nullptr);
 
   const tinyxml2::XMLElement* iso = elem->FirstChildElement("isotropic");
 
@@ -31,18 +35,17 @@ TEST(TestPoroMaterial, Parse)
   mat.parse(iso);
 
   Vec3 X;
-  ASSERT_FLOAT_EQ(mat.getFluidDensity(X), 1000.0);
-  ASSERT_FLOAT_EQ(mat.getSolidDensity(X), 2700.0);
-  ASSERT_FLOAT_EQ(mat.getViscosity(X), 9810.0);
-  ASSERT_FLOAT_EQ(mat.getPorosity(X), 0.5);
-  ASSERT_FLOAT_EQ(mat.getStiffness(X), 1000000.0);
-  ASSERT_FLOAT_EQ(mat.getPoisson(X), 0.0);
-  ASSERT_FLOAT_EQ(mat.getBulkFluid(X), 1e99);
-  ASSERT_FLOAT_EQ(mat.getBulkSolid(X), 1e99);
-  ASSERT_FLOAT_EQ(mat.getBulkMedium(X), 0.0);
+  REQUIRE_THAT(mat.getFluidDensity(X), WithinRel(1000.0));
+  REQUIRE_THAT(mat.getSolidDensity(X), WithinRel(2700.0));
+  REQUIRE_THAT(mat.getViscosity(X), WithinRel(9810.0));
+  REQUIRE_THAT(mat.getPorosity(X), WithinRel(0.5));
+  REQUIRE_THAT(mat.getStiffness(X), WithinRel(1000000.0));
+  REQUIRE_THAT(mat.getPoisson(X), WithinAbs(0.0, 1e-13));
+  REQUIRE_THAT(mat.getBulkFluid(X), WithinRel(1e99));
+  REQUIRE_THAT(mat.getBulkSolid(X), WithinRel(1e99));
+  REQUIRE_THAT(mat.getBulkMedium(X), WithinAbs(0.0, 1e-13));
   Vec3 perm = mat.getPermeability(X);
-  ASSERT_FLOAT_EQ(perm[0], 0.0000000115741);
-  ASSERT_FLOAT_EQ(perm[1], 0.0000000115741);
-  ASSERT_FLOAT_EQ(perm[2], 0.0);
-
+  REQUIRE_THAT(perm[0], WithinRel(0.0000000115741));
+  REQUIRE_THAT(perm[1], WithinRel(0.0000000115741));
+  REQUIRE_THAT(perm[2], WithinAbs(0.0, 1e-13));
 }
