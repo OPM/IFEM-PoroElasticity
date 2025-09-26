@@ -1,96 +1,118 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.22)
 
-project(PoroElasticity)
+project(PoroElasticity LANGUAGES C CXX)
 
-# Add local modules
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
-                      ${PROJECT_SOURCE_DIR}/../../cmake/Modules
-                      $ENV{HOME}/cmake/Modules)
-
-# Required packages
-if(NOT IFEM_CONFIGURED)
-  find_package(IFEM REQUIRED)
-  include_directories(${IFEM_INCLUDE_DIRS})
-  add_definitions(${IFEM_DEFINITIONS})
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IFEM_CXX_FLAGS}")
+if(NOT TARGET IFEM)
+  if(IFEM_AS_SUBMODULE)
+    add_subdirectory(../.. IFEM)
+    set(IFEM_PATH ${PROJECT_SOURCE_DIR}/../..)
+  else()
+    get_filename_component(BUILD_DIR ${PROJECT_BINARY_DIR} NAME)
+    set(IFEM_DIR ${PROJECT_SOURCE_DIR}/../../${BUILD_DIR})
+    find_package(IFEM REQUIRED)
+  endif()
 endif()
 
-set(ELASTICITY_DIR ${PROJECT_SOURCE_DIR}/../IFEM-Elasticity)
-if(NOT EXISTS ${ELASTICITY_DIR})
-  set(ELASTICITY_DIR ${PROJECT_SOURCE_DIR}/../Elasticity)
-endif()
-
-include_directories(${IFEM_INCLUDES} ../Common ${PROJECT_SOURCE_DIR}
-                    ${ELASTICITY_DIR} ${PROJECT_SOURCE_DIR}/PoroElastic)
-
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
-
-if(NOT TARGET Elasticity)
-  add_subdirectory(${ELASTICITY_DIR} Elasticity)
-endif()
+ifem_add_dependency_dir(APP Elasticity TARGET Elasticity)
 
 if(NOT TARGET PoroElastic)
   add_subdirectory(PoroElastic)
 endif()
 
-add_executable(PoroElasticity main.C)
-
-target_link_libraries(PoroElasticity PoroElastic Elasticity ${IFEM_LIBRARIES})
-
-list(APPEND CHECK_SOURCES main.C)
-
-# Installation
-install(TARGETS PoroElasticity DESTINATION bin COMPONENT bin)
-
-# For generating the doxy
-set(EXTRA_DOXY_PATHS "${PROJECT_SOURCE_DIR} \\
-                      ${PROJECT_BINARY_DIR} \\
-                      ${PROJECT_SOURCE_DIR}/PoroElastic \\
-                      ${ELASTICITY_DIR}")
-add_doc_target(PoroElasticity PoroElasticity)
+ifem_add_application(
+  NAME
+    PoroElasticity
+  SOURCES
+    main.C
+  HEADERS
+    SIMDynPoroElasticity.h
+    SIMStatPoroElasticity.h
+  LIBRARIES
+    IFEMAppCommon
+    PoroElastic
+)
 
 # Testing
 enable_testing()
-include(IFEMTesting)
 
-# Regression tests
-if(MPI_FOUND)
-  # Add parallel tests here
-endif()
-if(NOT MPI_FOUND OR IFEM_SERIAL_TESTS_IN_PARALLEL)
-  ifem_add_test(Plaxis1DVerif.reg PoroElasticity)
-  ifem_add_test(Plaxis1DVerif-mixed_C0.reg PoroElasticity)
-  ifem_add_test(Plaxis1DVerif-nonmixed.reg PoroElasticity)
-  ifem_add_test(Plaxis1DVerif-nondim.reg PoroElasticity)
-  ifem_add_test(OGSBenchmark1D.reg PoroElasticity)
-  ifem_add_test(OGSBenchmark1D-nonmixed.reg PoroElasticity)
-  ifem_add_test(Terzhagi.reg PoroElasticity)
-  ifem_add_test(Terzhagi-nondim.reg PoroElasticity)
-  ifem_add_test(SoilColumn3D.reg PoroElasticity)
-  ifem_add_test(SoilColumn3D-nonmixed.reg PoroElasticity)
-  ifem_add_test(VolFlux.reg PoroElasticity)
-  if(LRSpline_FOUND)
-    ifem_add_test(Plaxis1DVerif-LR.reg PoroElasticity)
-    ifem_add_test(OGSBenchmark1D-LR.reg PoroElasticity)
-  endif()
-  if(HDF5_FOUND AND CEREAL_FOUND)
-    ifem_add_restart_test(Terzhagi-restart.reg PoroElasticity 5)
-  endif()
-  ifem_add_vtf_test(SoilColumn3D.vreg PoroElasticity)
-  ifem_add_hdf5_test(Terzhagi.hreg PoroElasticity)
-  ifem_add_hdf5_test(SoilColumn3D.hreg PoroElasticity)
-  ifem_add_hdf5_test(SoilColumn3D-nonmixed.hreg PoroElasticity)
-endif()
-list(APPEND TEST_APPS PoroElasticity)
+ifem_add_hdf5_test(
+  TARGET
+    PoroElasticity
+  TEST_FILES
+    Terzhagi.hreg
+    SoilColumn3D.hreg
+    SoilColumn3D-nonmixed.hreg
+)
+
+ifem_add_vtf_test(
+  TARGET
+    PoroElasticity
+  TEST_FILES
+    SoilColumn3D.vreg
+)
+
+ifem_add_restart_test(
+  TARGET
+    PoroElasticity
+  TEST_FILES
+    Terzhagi-restart.reg
+  RESTART_LEVEL
+    5
+)
+
+ifem_add_regression_test(
+  TARGET
+    PoroElasticity
+  TEST_FILES
+    Plaxis1DVerif.reg
+    Plaxis1DVerif-mixed_C0.reg
+    Plaxis1DVerif-nonmixed.reg
+    Plaxis1DVerif-nondim.reg
+    OGSBenchmark1D.reg
+    OGSBenchmark1D-nonmixed.reg
+    Terzhagi.reg
+    Terzhagi-nondim.reg
+    SoilColumn3D.reg
+    SoilColumn3D-nonmixed.reg
+    VolFlux.reg
+)
+
+ifem_add_regression_test(
+  TARGET
+    PoroElasticity
+  CONDITIONS
+    LRSpline_FOUND
+  TEST_FILES
+    Plaxis1DVerif-LR.reg
+    OGSBenchmark1D-LR.reg
+)
 
 # Unit tests
-IFEM_add_test_app(SOURCES ${PROJECT_SOURCE_DIR}/Test/*.C
-                  WORKDIR ${PROJECT_SOURCE_DIR}/Test
-                  NAME PoroElasticity
-                  LIBRARIES PoroElastic Elasticity ${IFEM_LIBRARIES})
+ifem_add_test_app(
+  NAME
+    PoroElasticity
+  SOURCES
+    Test/TestPoroMaterial.C
+    Test/TestSIMPoroElasticity.C
+  WORKDIR
+    ${PROJECT_SOURCE_DIR}/Test
+  LIBRARIES PoroElastic
+)
 
 if(IFEM_COMMON_APP_BUILD)
   set(TEST_APPS ${TEST_APPS} PARENT_SCOPE)
 else()
-  add_check_target()
+  ifem_add_check_target()
 endif()
+
+# For generating the doxy
+ifem_add_doc_target(
+  TARGET
+    PoroElasticity
+  EXTRA_DIRS
+    ${Elasticity_DIRECTORY}
+)
+
+# Installation
+include(GNUInstallDirs)
+install(TARGETS PoroElasticity DESTINATION ${CMAKE_INSTALL_BINDIR})

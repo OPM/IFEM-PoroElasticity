@@ -576,8 +576,7 @@ WARN_LOGFILE           = @PROJECT_BINARY_DIR@/DoxyWarnings.log
 
 INPUT                  = @PROJECT_SOURCE_DIR@ \
                          @PROJECT_SOURCE_DIR@/PoroElastic \
-                         @PROJECT_SOURCE_DIR@/../IFEM-Elasticity \
-                         @PROJECT_BINARY_DIR@
+                         @EXTRA_DOXY_PATHS@
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is

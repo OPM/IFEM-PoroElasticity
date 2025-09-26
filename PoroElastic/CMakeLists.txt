@@ -1,14 +1,21 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.22)
 
-project(PoroElastic)
+project(PoroElastic LANGUAGES C CXX)
 
-include_directories(${PROJECT_SOURCE_DIR}/.. ${ELASTICITY_DIR})
-
-set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
-
-file(GLOB PoroEl_SOURCES *.C)
-file(GLOB PoroEl_HEADERS *.h)
-add_library(PoroElastic STATIC ${PoroEl_SOURCES})
-
-list(APPEND CHECK_SOURCES ${PoroEl_SOURCES})
-set(CHECK_SOURCES ${CHECK_SOURCES} PARENT_SCOPE)
+ifem_add_library(
+  NAME
+    PoroElastic
+  SOURCES
+    PoroElasticity.C
+    PoroMaterial.C
+    PoroMats.C
+    PoroSolutions.C
+    SIMPoroElasticity.C
+  HEADERS
+    PoroElasticity.h
+    PoroMaterial.h
+    PoroSolutions.h
+    SIMPoroElasticity.h
+  LIBRARIES
+    Elasticity
+)
