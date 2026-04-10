@@ -170,7 +170,7 @@ double PoroMaterial::getBiotModulus (const Vec3& X, double al, double po) const
 }
 
 
-double PoroMaterial::getStiffness (const Vec3& X) const
+double PoroMaterial::getStiffness (const Vec3& X, double) const
 {
   return Emod.evaluate(X);
 }

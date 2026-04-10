@@ -71,8 +71,6 @@ public:
 
   //! \brief The constructor initializes Biot's parameters to -1 (undefined).
   PoroMaterial() { alpha = Minv = -1.0; }
-  //! \brief Empty destructor.
-  virtual ~PoroMaterial() {}
 
   //! \brief Parses material parameters from an XML element.
   virtual void parse(const tinyxml2::XMLElement* elem);
@@ -103,7 +101,7 @@ public:
   //! \brief Returns the inverse Biot's modulus at the current point.
   double getBiotModulus(const Vec3& X, double al, double po) const;
   //! \brief Returns stiffness at the current point.
-  virtual double getStiffness(const Vec3& X) const;
+  virtual double getStiffness(const Vec3& X, double = 0.0) const;
   //! \brief Returns Poisson's ratio at the current point.
   virtual double getPoisson(const Vec3& X) const;
 
@@ -113,10 +111,10 @@ public:
   //! \param[out] U Strain energy density at current point
   //! \param[in] X Cartesian coordinates of current point
   //! \param[in] eps Strain tensor at current point
-  //! \param[in] iop Calculation option;
-  //!   0 : Calculate the constitutive matrix only,
-  //!   1 : Calculate Cauchy stresses and the constitutive matrix,
-  //!   3 : Calculate the strain energy density only.
+  //! \param[in] iop Calculation option:
+  //! - 0 : Calculate the constitutive matrix only,
+  //! - 1 : Calculate Cauchy stresses and the constitutive matrix,
+  //! - 3 : Calculate the strain energy density only.
   virtual bool evaluate(Matrix& Cmat, SymmTensor& sigma, double& U,
                         const FiniteElement&, const Vec3& X,
                         const Tensor&, const SymmTensor& eps,
