@@ -13,7 +13,14 @@ if(NOT TARGET IFEM)
   endif()
 endif()
 
-ifem_add_dependency_dir(APP Elasticity TARGET Elasticity)
+ifem_add_dependency_dir(
+  APP
+    Elasticity
+  TARGET
+    Elasticity
+  DIR
+    Elasticity
+)
 
 if(NOT TARGET PoroElastic)
   add_subdirectory(PoroElastic)
