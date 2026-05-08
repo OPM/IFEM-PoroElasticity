@@ -22,8 +22,8 @@ ifem_add_dependency_dir(
     Elasticity
 )
 
-if(NOT TARGET PoroElastic)
-  add_subdirectory(PoroElastic)
+if(NOT TARGET IFEM::PoroElasticity)
+  add_subdirectory(PoroElasticity)
 endif()
 
 ifem_add_application(
@@ -36,7 +36,7 @@ ifem_add_application(
     SIMStatPoroElasticity.h
   LIBRARIES
     IFEM::AppUtils
-    PoroElastic
+    IFEM::PoroElasticity
 )
 
 # Testing
@@ -103,7 +103,8 @@ ifem_add_test_app(
     Test/TestSIMPoroElasticity.C
   WORKDIR
     ${PROJECT_SOURCE_DIR}/Test
-  LIBRARIES PoroElastic
+  LIBRARIES
+    IFEM::PoroElasticity
 )
 
 if(IFEM_COMMON_APP_BUILD)

@@ -575,7 +575,7 @@ WARN_LOGFILE           = @PROJECT_BINARY_DIR@/DoxyWarnings.log
 # with spaces.
 
 INPUT                  = @PROJECT_SOURCE_DIR@ \
-                         @PROJECT_SOURCE_DIR@/PoroElastic \
+                         @PROJECT_SOURCE_DIR@/PoroElasticity \
                          @EXTRA_DOXY_PATHS@
 
 # This tag can be used to specify the character encoding of the source files

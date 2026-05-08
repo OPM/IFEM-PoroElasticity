@@ -5,6 +5,8 @@ project(PoroElastic LANGUAGES C CXX)
 ifem_add_library(
   NAME
     PoroElastic
+  ALIAS
+    IFEM::PoroElasticity
   SOURCES
     PoroElasticity.C
     PoroMaterial.C
@@ -18,4 +20,9 @@ ifem_add_library(
     SIMPoroElasticity.h
   LIBRARIES
     Elasticity
+)
+set_target_properties(PoroElastic
+  PROPERTIES
+  ARCHIVE_OUTPUT_NAME
+    PoroElasticity
 )
