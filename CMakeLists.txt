@@ -35,7 +35,7 @@ ifem_add_application(
     SIMDynPoroElasticity.h
     SIMStatPoroElasticity.h
   LIBRARIES
-    IFEMAppCommon
+    IFEM::AppUtils
     PoroElastic
 )
 
