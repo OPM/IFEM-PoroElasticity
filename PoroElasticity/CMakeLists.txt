@@ -7,6 +7,8 @@ ifem_add_library(
     PoroElastic
   ALIAS
     IFEM::PoroElasticity
+  ARCHIVE_NAME
+    PoroElasticity
   SOURCES
     PoroElasticity.C
     PoroMaterial.C
@@ -20,9 +22,4 @@ ifem_add_library(
     SIMPoroElasticity.h
   LIBRARIES
     IFEM::Elasticity
-)
-set_target_properties(PoroElastic
-  PROPERTIES
-  ARCHIVE_OUTPUT_NAME
-    PoroElasticity
 )
