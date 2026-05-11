@@ -19,7 +19,7 @@ ifem_add_library(
     PoroSolutions.h
     SIMPoroElasticity.h
   LIBRARIES
-    Elasticity
+    IFEM::Elasticity
 )
 set_target_properties(PoroElastic
   PROPERTIES
