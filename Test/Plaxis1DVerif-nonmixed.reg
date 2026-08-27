@@ -1,4 +1,4 @@
-Plaxis1DVerif-nonmixed.xinp -2D -halfstatic
+Plaxis1DVerif-nonmixed.xinp -2D -halfstatic -zero_print_tol 1.0e-8
 
 Input file: Plaxis1DVerif-nonmixed.xinp
 Equation solver: 2
